@@ -42,9 +42,11 @@ from typing import NamedTuple, Sequence
 
 import mapbox_earcut
 import numpy as np
+import trimesh
 
 from .. import clipper
 from ..extrude import _dedupe_closing_vertex, _oriented, _signed_area
+from ..extrude import extrude as _extrude
 
 Ring = list[tuple[float, float]]
 
@@ -220,9 +222,64 @@ def extrude_stepped(
             emit_cap(hole, [], thickness, up=True)
             emit_wall(hole, thickness, top, outward=False)
 
-    return np.asarray(vertices, dtype=np.float64), np.asarray(faces, dtype=np.int64)
+    verts = np.asarray(vertices, dtype=np.float64)
+    tris = np.asarray(faces, dtype=np.int64)
+    _assert_closed(tris)
+    return verts, tris
+
+
+def _assert_closed(faces: np.ndarray) -> None:
+    """Refuse to return a surface that is not closed.
+
+    The cap triangulator is an ear-clipper, not a *constrained* triangulator. It
+    is free to merge collinear boundary segments -- and when two features in the
+    same cap have collinear edges (every glyph on a shared text baseline does),
+    it emits one long cap edge instead of the separate feature edges the walls
+    were built from. Area comes out right, so the fault is invisible to an area
+    check, but caps and walls no longer correspond and the surface is open.
+
+    Rather than hand back geometry that only looks correct, fail here. Callers
+    with collinear features should assemble those parts with a boolean union
+    instead (see `union_all`).
+    """
+    if len(faces) == 0:
+        raise ValueError("no faces generated")
+    edges = np.sort(faces[:, [0, 1, 1, 2, 2, 0]].reshape(-1, 2), axis=1)
+    _, counts = np.unique(edges, axis=0, return_counts=True)
+    bad = int((counts != 2).sum())
+    if bad:
+        raise ValueError(
+            f"stepped extrusion produced {bad} non-manifold edge(s). This usually "
+            "means two features in the same cap have collinear boundaries, which "
+            "the ear-clipping triangulator may merge. Assemble those parts with "
+            "union_all() instead."
+        )
 
 
 def footprint_area(ring: Ring) -> float:
     """Absolute area of a ring, for volume assertions and reports."""
     return abs(_signed_area(ring))
+
+
+def prism(
+    outer: Ring, z0: float, z1: float, holes: Sequence[Ring] = ()
+) -> "trimesh.Trimesh":
+    """A plain prism between two Z planes, optionally with through-holes."""
+    v, f = _extrude(outer, [list(h) for h in holes], z0, z1)
+    return trimesh.Trimesh(vertices=v, faces=f, process=False)
+
+
+def union_all(meshes: Sequence["trimesh.Trimesh"]) -> "trimesh.Trimesh":
+    """Union meshes into one guaranteed-manifold solid.
+
+    Used where a body cannot be built manifold-by-construction in one pass --
+    label lettering, whose glyphs sit on a shared baseline and so present the
+    collinear-boundary case `_assert_closed` refuses. manifold3d is a
+    manifoldness-preserving boolean engine, so this is a guarantee rather than a
+    repair pass: the result is verified by the project's own validator either way.
+    """
+    if not meshes:
+        raise ValueError("nothing to union")
+    if len(meshes) == 1:
+        return meshes[0]
+    return trimesh.boolean.union(list(meshes), engine="manifold")

@@ -79,6 +79,16 @@ LABEL_SIZE_MM: float = 3.0
 CONTROL_CLEARANCE_MM: float = 0.10
 CONTROL_DEPTH_MM: float = 0.20
 
+# --- derived-geometry inspection --------------------------------------------
+
+#: Minimum feature width used when *inspecting* derived fabrication geometry.
+#:
+#: Same 0.4 mm nozzle assumption as Spike 01's canonical cleanup, but applied in
+#: report-only mode: derived geometry is never mutated, because the clearances
+#: under test are themselves far below this threshold and cleanup would erase the
+#: experiment (Issue #3 pipeline rule).
+MIN_SUPPORT_FEATURE_MM: float = 0.4
+
 
 def child_thickness(depth: float, h: float = H_VISIBLE_STEP_MM) -> float:
     """Physical thickness of a child that seats `depth` and shows `h`."""

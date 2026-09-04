@@ -138,3 +138,27 @@ def test_boss_hole_must_lie_inside_its_boss():
     stray = [(12.0, 2.0), (14.0, 2.0), (14.0, 4.0), (12.0, 4.0)]
     with pytest.raises(ValueError, match="inside its boss"):
         solids.extrude_stepped(SQ20, 1.6, (), [solids.Boss(ring, 0.6, (stray,))])
+
+
+def test_collinear_feature_boundaries_are_refused_not_silently_broken():
+    """Glyphs on a shared baseline defeat the ear-clipping cap triangulator.
+
+    Area still comes out right, so an area check would pass while caps and walls
+    no longer correspond. The extruder must refuse rather than return it.
+    """
+    a = [(2.0, 2.0), (6.0, 2.0), (6.0, 8.0), (2.0, 8.0)]
+    b = [(10.0, 2.0), (14.0, 2.0), (14.0, 8.0), (10.0, 8.0)]  # bottoms collinear
+    with pytest.raises(ValueError, match="non-manifold|collinear"):
+        solids.extrude_stepped(SQ20, 1.6, (), [solids.Boss(a, 0.6), solids.Boss(b, 0.6)])
+
+
+def test_union_all_assembles_collinear_features_correctly():
+    a = [(2.0, 2.0), (6.0, 2.0), (6.0, 8.0), (2.0, 8.0)]
+    b = [(10.0, 2.0), (14.0, 2.0), (14.0, 8.0), (10.0, 8.0)]
+    v, f = solids.extrude_stepped(SQ20, 1.6)
+    body = trimesh.Trimesh(vertices=v, faces=f, process=False)
+    merged = solids.union_all(
+        [body, solids.prism(a, 1.6, 2.2), solids.prism(b, 1.6, 2.2)]
+    )
+    assert_sound(merged, "unioned")
+    assert math.isclose(merged.volume, 400.0 * 1.6 + 24.0 * 0.6 * 2, rel_tol=1e-6)
