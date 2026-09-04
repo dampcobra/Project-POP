@@ -30,6 +30,15 @@ CLIPPER_SCALE: float = 1e6
 #: spike, per Issue #1. Not yet validated against physical prints.
 MIN_FEATURE_MM: float = 0.4
 
+#: Area below which a cleanup sliver is numerical dust rather than a feature.
+#:
+#: An offset round trip on the 1e-6 mm integer grid leaves wobble of order
+#: EPS along the boundary, so a ring of ~100 mm perimeter can shed ~1e-4 mm2
+#: of spurious area at shallow-angle vertices. 1e-3 mm2 sits an order of
+#: magnitude above that dust and ~450x below the 0.45 mm2 test tab, so it
+#: separates the two cleanly without tuning to this specific artwork.
+SLIVER_AREA_EPS_MM2: float = 1e-3
+
 # --- Z bands ---------------------------------------------------------------
 
 #: Structural backing band.
