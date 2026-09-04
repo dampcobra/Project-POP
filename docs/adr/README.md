@@ -10,4 +10,4 @@ when the evidence it is waiting on arrives.
 
 | # | Title | Status | Date |
 |---|---|---|---|
-| [0001](0001-spike-01-canonical-geometry-architecture.md) | Canonical geometry architecture following Spike 01 | Accepted (decisions 7–8 provisional) | 2026-09-04 |
+| [0001](0001-spike-01-canonical-geometry-architecture.md) | Canonical geometry architecture following Spike 01 | Accepted — 1–7 confirmed by physical validation; 8 revised | 2026-09-04 |

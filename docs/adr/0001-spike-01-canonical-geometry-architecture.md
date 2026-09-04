@@ -1,6 +1,7 @@
 # ADR 0001 — Canonical geometry architecture following Spike 01
 
-- **Status:** Accepted (decisions 7–8 provisional pending physical validation)
+- **Status:** Accepted — decisions 1–7 confirmed by physical validation;
+  decision 8 revised
 - **Date:** 2026-09-04
 - **Session:** 0 — Product Definition & MVP
 - **Deciders:** Andy (Product Owner), Elara/ChatGPT (PM & Architect), Claude (Developer)
@@ -8,6 +9,17 @@
 - **Related:** [Issue #1](https://github.com/dampcobra/Project-POP/issues/1) ·
   PR #2 · [`docs/spike-01/conclusion.md`](../spike-01/conclusion.md) ·
   [`docs/spike-01/geometry-spec.md`](../spike-01/geometry-spec.md)
+
+### Revision history
+
+| Date | Change |
+|---|---|
+| 2026-09-04 | Accepted on software evidence. Decisions 7–8 provisional pending physical validation. |
+| 2026-09-04 | Physical validation complete. **Spike 01 marked PASS.** Decisions 1–7 confirmed; decision 6 strengthened with print evidence; **decision 8 revised** — full-depth zero-clearance island insertion rejected by physical testing. |
+
+Revision is permitted here because decision 8 was recorded as explicitly
+provisional pending this evidence. Decisions 1–7 are unchanged in substance;
+where they gained supporting evidence, that is noted in place.
 
 ## Context
 
@@ -20,6 +32,12 @@ The spike built the "Spike Glyph" — a 50 × 50 mm badge with a structural
 backing, an irregular foreground carrying a concave V-notch, an enclosed island
 occupying a literal hole in the foreground, and a deliberately unmanufacturable
 0.15 mm tab. All five software pass criteria passed across 55 tests.
+
+**Spike 01 subsequently passed slicer and physical validation.** All three bodies
+imported into Bambu Studio at the correct shared position with no geometry-repair
+warnings and sliced successfully; the print completed with backing and foreground
+clean. The island would not fit its zero-clearance opening — a fabrication-geometry
+finding, not a topology failure, and the evidence behind decisions 6 and 8 below.
 
 This ADR records the architectural decisions that follow. Full evidence and
 reasoning are in the spike conclusion; this document is the durable decision
@@ -122,14 +140,31 @@ manufacturability defect. A tolerance policy needs distinct values per dimension
 
 ### 6. Exact coincident boundaries remain canonical. Clearance belongs in export profiles.
 
+*Confirmed by physical validation.*
+
 Adjacent regions meet at mathematically identical coordinates: zero clearance,
 zero interference. This is the canonical representation and it does not change.
 
-If physical validation shows a boundary allowance is needed, it is applied at
-**export time as a per-slicer profile** — never in the canonical model. Baking a
-clearance into the model would break the shared-boundary invariant that decision
-1 exists to establish, and would couple the canonical geometry to a particular
-slicer's behaviour, violating Layercake's slicer-agnostic principle.
+Where physical validation shows a boundary allowance is needed, it is applied at
+**export time as derived fabrication geometry** — never in the canonical model.
+Baking a clearance into the model would break the shared-boundary invariant that
+decision 1 exists to establish, and would couple the canonical geometry to a
+particular slicer's behaviour, violating Layercake's slicer-agnostic principle.
+
+**Physical evidence (2026-09-04).** The print settled both halves of this.
+Zero clearance is *correct canonically* — the shared boundary validated at
+0.0 mm² gap and overlap, and the bodies sliced with no repair warnings. Zero
+clearance is *unusable for assembly* — the island would not fit its opening,
+because coincident surfaces leave no room for extrusion width, elephant's foot or
+ordinary print tolerance.
+
+So clearance has moved from hypothetical to **required**, with a measured reason,
+while its architectural home is unchanged. Its value is a manufacturing parameter
+— a function of nozzle, material, printer and tolerance appetite — which is
+exactly why it belongs in an export profile rather than the artwork. The value
+itself is not yet established; the spike proves only that zero is wrong.
+
+This is the decision the physical test was most likely to overturn, and it held.
 
 **Consequence to watch:** inter-body interference is currently checked in 2D via
 band gap/overlap validation. That is exact for the flat-mosaic MVP, where every
@@ -139,9 +174,17 @@ interference check becomes necessary.
 
 ### 7. STL bodies are separate and co-registered. Material assignment is downstream.
 
+*Confirmed by slicer validation.*
+
 MVP 3D export is separate, co-registered STL bodies sharing one origin, with no
 per-body translation applied — co-registration is a property of the pipeline
 rather than a post-export correction.
+
+**Slicer evidence (2026-09-04).** All three bodies imported into Bambu Studio at
+the correct shared position with **no geometry-repair warnings**, and sliced
+successfully. Exporting without per-body translation is therefore sufficient for
+co-registration in a real slicer, and the manifold guarantees held outside our own
+validation code.
 
 Layercake owns manufacturable geometry. Filament and material assignment belong
 to the downstream slicer. Bambu Studio is Andy's validation slicer, **not an
@@ -157,25 +200,79 @@ is **not cross-checked against an independent validator**, is O(n²), and treats
 touching as non-intersecting. Adding a second validator before this informs
 production architecture is an open question.
 
-### 8. Island anchoring and minimum-feature policy are provisional pending print validation.
+### 8. Full-depth zero-clearance island insertion is REJECTED. Registration recesses to be investigated. — REVISED 2026-09-04
 
-Both are implemented and deliberately held open.
+**Previously (superseded):** an enclosed island exported as an independent body
+rests on the backing over 100 % of its footprint, held by inter-layer adhesion
+with no mechanical interlock. The open question was whether adhesion alone would
+be secure enough.
 
-**Island anchoring.** An enclosed island exported as an independent body rests on
-the backing over 100 % of its footprint, satisfying the containment criterion.
-There is **no mechanical interlock** — no dovetail, lip or keying. The island is
-held by inter-layer adhesion alone. Likely fine at 8 × 8 mm; much less obviously
-fine for a small island, a tall artwork band, or a material pairing with poor
-interlayer bonding.
+**Rejected by physical testing.** The question never arose, because the island
+could not be inserted at all. Modelling an island as a full-depth plug occupying a
+zero-clearance hole through the entire artwork band does not survive contact with
+a real printer.
 
-**Minimum-feature policy.** Current policy is *detect, report, remove
-deterministically* before mesh generation, at a 0.4 mm threshold. The threshold
-is an assumption taken from nozzle diameter, not a measurement. Whether removal
-is right — against enlargement, or surfacing a choice to the user — is unresolved;
-a decorative tab and a structural one may warrant different answers.
+The rejected model bundled two separate problems:
 
-Neither is settled until the physical print is assessed. **This ADR should be
-revised once that evidence exists.**
+1. **No manufacturing clearance** — addressed architecturally by decision 6.
+2. **Full-depth press fit** — even with clearance, a plug spanning the full
+   artwork band asks the island to be a friction-fit mechanical joint. The
+   artwork only needs the island to be *positioned*.
+
+#### Direction to investigate next
+
+Agreed with Andy from the physical result and a construction sketch. **Recorded
+as intent, not as an accepted design — it is unbuilt and untested, and is
+deliberately not implemented in PR #2.**
+
+1. A continuous structural backing remains underneath the entire artwork.
+2. Main colour bodies sit on that backing.
+3. Where an enclosed island needs positioning, the surrounding colour body
+   carries a **shallow registration recess**, not a through-hole.
+4. The recess is larger than the inserted piece by a **configurable manufacturing
+   clearance**.
+5. The recess is an assembly and positioning guide, **not a friction fit**.
+6. Final pieces are glued to the backing.
+7. **Canonical artwork geometry remains exact.** Registration clearance is
+   derived fabrication geometry and must not alter canonical topology.
+
+Point 7 is the load-bearing constraint and is simply decision 6 restated for this
+case. The recess model changes what is *derived at export*; it must not change
+what the canonical model holds.
+
+This reframes an island from a structural part to a located inlay, moving the
+mechanical job from press fit to adhesive.
+
+#### Open geometry questions before implementation
+
+- **Recess depth versus island thickness.** A shallow recess has a floor of
+  surrounding-body material, so the island would rest on **that body rather than
+  on the backing** — a change from the spike, where the island sat directly on
+  the backing. Does the island then become thinner than the artwork band, sized
+  to recess depth so its top finishes flush?
+- **Which surface is the datum?** A flush top surface and seating on the recess
+  floor are only simultaneously satisfiable if island thickness and recess depth
+  are derived from one another.
+- **Where is clearance applied?** Growing the recess, shrinking the island, or
+  splitting the allowance are three different strategies with different visible
+  gap widths on the finished piece.
+- **Does the recess floor need its own minimum-thickness rule?** It becomes a
+  thin horizontal web subject to the same manufacturability limits as any other
+  feature.
+
+#### Minimum-feature policy — still provisional
+
+Unchanged and still open. Current policy is *detect, report, remove
+deterministically* before mesh generation, at a 0.4 mm threshold taken from
+nozzle diameter as an assumption, not a measurement.
+
+**The print did not test it.** The tab was removed before export, so the
+threshold's correctness was never physically exercised. Whether removal is right
+— against enlargement, or surfacing a choice to the user — remains unresolved; a
+decorative tab and a structural one may warrant different answers.
+
+This part of decision 8 still awaits evidence and should be revised when it
+arrives.
 
 ---
 
@@ -207,8 +304,18 @@ revised once that evidence exists.**
 
 - DCEL migration (decision 1).
 - Final application stack — Python was chosen for spike velocity only.
-- Export clearance profiles, if physical validation calls for them (decision 6).
-- Confirmation or revision of decision 8 after the print.
+- **Export clearance profiles — no longer optional.** Physical validation showed
+  zero-clearance assembly does not work, so a fabrication-geometry stage is now
+  required work rather than a contingency (decisions 6 and 8).
+- **Registration recess model** — direction agreed, unbuilt and untested
+  (decision 8).
+- Resolution of the minimum-feature policy, which the print did not exercise
+  (decision 8).
+
+Because clearance and recesses are derived at export and never enter the
+canonical model, this is **additive work rather than rework**. The topology
+proved out by the spike is unaffected — which is the practical payoff of
+decision 6.
 
 ---
 
@@ -219,8 +326,18 @@ revised once that evidence exists.**
 | Software pass criteria (5/5), 55 tests | Complete — PR #2 |
 | Manifold validation, 3 bodies | Complete — `artefacts/validation-report.md` |
 | Numeric gap/overlap validation | Complete — 0.0 mm² each, tolerance 1e-6 mm |
-| Bambu Studio import/slice evidence | **Outstanding — Andy** |
-| Physical print and observations | **Outstanding — Andy** |
+| Bambu Studio import/slice evidence | **Complete** — 3/3 imported at shared position, no repair warnings, sliced successfully |
+| Physical print and observations | **Complete** — printed cleanly; island would not fit zero-clearance opening |
 
-Decisions 1–6 stand on completed evidence. Decisions 7–8 carry the provisional
-elements noted above.
+**Spike 01: PASS.**
+
+Decisions 1–7 stand on completed software, slicer and physical evidence.
+Decision 8 has been revised: full-depth zero-clearance island insertion is
+rejected on physical evidence, and the registration-recess direction that
+replaces it is recorded as intent to investigate, not as an accepted design.
+The minimum-feature policy within decision 8 remains provisional and untested.
+
+Photographic evidence — the printed badge with the loose island, and the
+construction sketch — is held by Andy and is not currently committed to the
+repository. The physical-validation write-up in this ADR and in the spike
+conclusion is from Andy's description of those photographs.

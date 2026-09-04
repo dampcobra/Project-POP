@@ -1,7 +1,8 @@
-Implements the software portion of #1.
+Implements #1.
 
-**Do not merge yet** — Bambu Studio slice evidence and the physical print are
-outstanding and are Andy's to produce.
+**Spike 01: PASS.** Software, slicer and physical validation all complete.
+
+**Do not merge without Andy's say-so.**
 
 ## Verdict
 
@@ -9,21 +10,61 @@ outstanding and are Andy's to produce.
 
 A shared-vertex / shared-edge model backed by Clipper2 handled every case the
 issue put to it, with no point where the simpler model ran out of expressive
-power. All five software pass criteria pass; 55 tests green.
+power. All software pass criteria pass (55 tests green), the bodies sliced
+without repair warnings, and the print completed.
+
+Physical assembly did not: **the island would not fit its zero-clearance
+opening.** That is a fabrication-geometry finding, not a topology failure, and
+it is the most valuable thing the spike produced — it could only have been found
+by printing. Details below.
 
 | Criterion | Result | Evidence |
 |---|---|---|
 | Shared boundaries | PASS | Overlap 0.0 mm², gap 0.0 mm², tolerance 1e-6 mm, measured numerically |
 | Concave geometry | PASS | Both reflex vertices survive bit-exact; meshes watertight |
-| Island / containment | PASS | C is a hole in B, exported independently, 100 % contact with backing |
+| Island / containment | PASS (topology) | C is a hole in B, exported independently. Topologically correct; the *physical* full-depth insertion model it implied was rejected on print — see below |
 | Minimum feature handling | PASS | 0.15 mm tab detected (0.450 mm²) and removed before mesh generation |
 | Manifold validity | PASS | 3/3 bodies watertight, 0 non-manifold edges, 0 self-intersections |
+| Slicer validation | PASS | 3/3 imported at correct shared position; no repair warnings; sliced |
+| Physical validation | PASS with finding | Printed cleanly; assembly revealed the clearance requirement |
 
 Run `python -m layercake_spike`; artefacts land in `artefacts/` (committed).
 
+## Physical validation outcome
+
+**Slicer.** All three bodies imported into Bambu Studio at the correct shared
+position with **no geometry-repair warnings**, and sliced successfully. The
+manifold guarantees held outside our own validation code, and exporting with no
+per-body translation proved sufficient for co-registration.
+
+**Print.** Completed. Backing and foreground printed cleanly, including the
+concave notch and the edge left where the undersized tab was removed.
+
+**Finding.** The island would not fit its zero-clearance opening. Coincident
+surfaces leave no room for extrusion width, elephant's foot or ordinary print
+tolerance.
+
+This **vindicated ADR 0001 decision 6 rather than contradicting it**: clearance
+was already assigned to export as derived fabrication geometry and never to the
+canonical model. It moved from hypothetical to required, with a measured reason.
+That was the decision most likely to be overturned by printing, and it held —
+so this is additive work, not rework.
+
+**Rejected:** full-depth zero-clearance island insertion. It bundled two
+problems — no clearance, and asking the island to be a friction-fit joint when it
+only needs positioning.
+
+**Direction agreed, deliberately NOT implemented in this PR:** continuous backing
+under the whole artwork, main colour bodies on the backing, a **shallow
+registration recess** in the surrounding body rather than a through-hole, sized
+larger than the insert by a configurable clearance, acting as a positioning guide
+rather than a friction fit, with pieces glued. Canonical artwork geometry stays
+exact; clearance is derived at export. Recorded as intent in ADR 0001 decision 8,
+with the open geometry questions it raises.
+
 ## What is here
 
-Nine commits, one per pipeline stage, each with its tests:
+One commit per pipeline stage, each with its tests:
 
 `spec` (exact mm coordinates) → `clipper` (Clipper2 adapter) → `topology`
 (canonical partition) → `cleanup` (manufacturability) → `extrude` (watertight
@@ -58,9 +99,13 @@ Flagging these prominently as requested.
 - **Inter-body interference is checked in 2D, not 3D.** Exact for the flat-mosaic
   MVP where every body is a straight prism — but that equivalence **breaks the
   moment variable relief arrives**.
-- **The 0.4 mm minimum feature width is an assumption**, taken from the nozzle
-  diameter. Physical validation should inform whether it is right, and whether
-  removal beats enlargement.
+- **The 0.4 mm minimum feature width is still an assumption.** The print did
+  **not** exercise it — the tab was removed before export, so the threshold was
+  never physically tested. Whether 0.4 mm is right, and whether removal beats
+  enlargement, remains open.
+- **Slicer success is not mesh validation.** Bambu Studio reporting no repair
+  warnings is meaningful supporting evidence, but it is not a substitute for
+  cross-checking self-intersection results against MeshLab, admesh or Netfabb.
 
 ### Architectural findings that should shape Layercake
 
@@ -81,11 +126,12 @@ Flagging these prominently as requested.
    966). Now enforced in one place.
 4. **Tolerances need dimensions.** Filtering slivers by area using the *length*
    epsilon produced a false positive. Areas need an area-dimensioned threshold.
-5. **Island anchoring is adhesion only** — no mechanical interlock. Probably fine
-   at 8 × 8 mm; the thing most worth watching in the physical print.
-6. **No clearance/interference allowance is applied.** B and C meet at identical
-   coordinates. If an allowance turns out to be needed, it belongs in export as a
-   per-slicer profile, never in the canonical model.
+5. **Full-depth island insertion is rejected** — by physical testing, not by
+   analysis. Superseded by the registration-recess direction above.
+6. **Exact coincidence is canonical; clearance is derived at export.** Confirmed
+   by the print. B and C meet at identical coordinates in the model, and the
+   fabrication allowance belongs in an export profile, never in the canonical
+   geometry.
 
 ### Spec issue found
 
@@ -101,25 +147,31 @@ first test written, before implementation. Resolved by truncating the apex with 
 There is **no `clipper2` package on PyPI**. `pyclipper` is Clipper *1*. This uses
 `pyclipr` 0.1.8, which wraps Clipper2 2.0.1.
 
-## Outstanding — Andy
+## Completed — Andy
 
-- [ ] Bambu Studio import/slice evidence: all three STLs import at the correct
-      shared position and slice without geometry-repair warnings.
-- [ ] Physical print photograph and observations. Watch: boundary quality between
-      B and C, whether the island is mechanically secure, and that the removed tab
-      leaves a sensible edge.
+- [x] Bambu Studio import/slice evidence — 3/3 imported at the correct shared
+      position, no geometry-repair warnings, sliced successfully.
+- [x] Physical print and observations — printed cleanly; island would not fit its
+      zero-clearance opening.
+
+Photographs are held by Andy and are not committed to this repository; the
+physical-validation write-up is from Andy's description of them.
 
 ## Open questions for Andy / Elara
 
-1. Is silent removal the right production policy for undersized features, or
-   should the user get a choice (remove / enlarge / keep and warn)?
-2. Should export gain an optional per-slicer clearance profile, or stay at exact
-   coincidence?
-3. Is adhesion-only island anchoring acceptable, or should Layercake generate
-   mechanical keying for small islands?
+1. **Clearance value and strategy** — how much, and applied where (grow the
+   recess, shrink the island, or split the allowance)? Now live rather than
+   hypothetical.
+2. **Recess geometry** — depth vs island thickness, which surface is the datum,
+   and whether the recess floor needs its own minimum-thickness rule. Note a
+   shallow recess means the island rests on the surrounding body, not the
+   backing — a change from this spike.
+3. **Minimum-feature policy** — the print did not test the 0.4 mm threshold. Is
+   silent removal right, or should the user get a choice?
 4. Add an independent mesh validator to cross-check self-intersection results?
 
-Full write-up: `docs/spike-01/conclusion.md`. Session notes:
+Full write-up: `docs/spike-01/conclusion.md`. Decision record:
+`docs/adr/0001-spike-01-canonical-geometry-architecture.md`. Session notes:
 `docs/diary/2026-09-04-session-0.md`.
 
-Closes #1 once slicer and physical validation are complete.
+Closes #1.

@@ -2,13 +2,19 @@
 
 **Issue:** [dampcobra/Project-POP#1](https://github.com/dampcobra/Project-POP/issues/1)
 **Date:** 2026-09-04
-**Status:** Software portion complete and passing. Slicer and physical validation outstanding (Andy).
+**Status: PASS — complete.** Software, slicer and physical validation all done.
 
 ---
 
 ## Verdict
 
-**The proposed topology approach is viable. Do not escalate to a full DCEL yet.**
+**Spike 01 passes. The proposed topology approach is viable. Do not escalate to a
+full DCEL yet.**
+
+Geometry, slicing and printing all succeeded. Physical assembly did not: the
+island would not fit its zero-clearance opening. That is a **fabrication-geometry
+finding, not a topology failure** — and it is the single most valuable thing the
+spike produced, because it could only have been found by printing.
 
 A shared-vertex / shared-edge boundary representation backed by Clipper2 handled
 every case Issue #1 put to it — shared boundaries, reflex geometry, containment,
@@ -24,8 +30,50 @@ All five software pass criteria pass:
 | Island / containment | PASS | C is a hole in B, exported independently, 100 % contact with backing |
 | Minimum feature handling | PASS | 0.15 mm tab detected (0.450 mm²) and removed before mesh generation |
 | Manifold validity | PASS | 3/3 bodies watertight, 0 non-manifold edges, 0 self-intersections |
+| Slicer validation | PASS | All 3 bodies imported at correct shared position; no repair warnings; sliced successfully |
+| Physical validation | PASS with finding | Printed cleanly; assembly revealed the clearance requirement below |
 
 Reproduce with `python -m layercake_spike`; artefacts land in `artefacts/`.
+
+---
+
+## Physical validation
+
+Performed by Andy on 2026-09-04 using Bambu Studio as the validation slicer.
+Bambu Studio remains a validation tool, not an architectural dependency.
+
+### Slicer
+
+- All three STL bodies imported successfully.
+- **No geometry-repair warnings** — the manifold guarantees held up in a real
+  slicer, not just under trimesh.
+- Bodies registered correctly at the shared origin, confirming that exporting
+  without per-body translation is sufficient for co-registration.
+- Slicing completed successfully.
+
+### Print
+
+- The print completed successfully.
+- The backing (A) and the main foreground (B) printed cleanly, including the
+  concave V-notch and the boundary left where the undersized tab was removed.
+- **The island (C) would not physically fit into its zero-clearance opening.**
+
+### What that proves
+
+Mathematically coincident boundaries are correct as *canonical artwork geometry*
+and insufficient as *fabrication geometry*. Two surfaces at identical coordinates
+have no room for extrusion width, thermal expansion, elephant's foot or ordinary
+print tolerance, so the parts interfere on assembly.
+
+This vindicates the architecture rather than contradicting it. ADR 0001
+decision 6 already held that clearance belongs in export as derived fabrication
+geometry and never in the canonical model. What changed is that clearance moved
+from *hypothetical* to *required*, with a measured reason.
+
+**Evidence:** photographs held by Andy — the printed badge with the loose island
+resting on top, and a sketch of the proposed construction model. This write-up is
+from Andy's description of those photographs; they are not currently committed to
+the repository.
 
 ---
 
@@ -131,28 +179,80 @@ vertex reported as a manufacturability defect. A separate area threshold
 lengths, areas, angles — rather than one global epsilon reused wherever a
 comparison is needed.
 
-### 5. Island anchoring is adhesion only
+### 5. Full-depth island insertion is rejected — REVISED after physical testing
 
-C rests on the backing over 100 % of its 64 mm² footprint, which satisfies the
-issue's containment criterion. But there is **no mechanical interlock** — no
-dovetail, lip or keying. The island is held by inter-layer adhesion to A alone.
+**Original hypothesis (now disproved):** C rests on the backing over 100 % of its
+64 mm² footprint, held by inter-layer adhesion with no mechanical interlock. The
+open question was whether adhesion alone would be secure enough.
 
-That is very likely fine at 8 × 8 mm. It is much less obviously fine for a small
-island, a tall artwork band, or a material pairing with poor interlayer bonding.
-**This is the item most worth watching in physical validation.**
+**What the print showed:** the question never arose, because the island could not
+be inserted at all. Modelling an island as a full-depth plug occupying a
+zero-clearance hole through the entire artwork band does not survive contact with
+a real printer.
 
-### 6. No clearance or interference allowance is applied
+Two separate problems were bundled together in that model:
 
-B and C meet at mathematically identical coordinates — zero clearance, zero
-interference. This is the correct default for multi-material printing, where the
-slicer is expected to handle coincident surfaces, and it keeps Layercake
-slicer-agnostic.
+1. **No manufacturing clearance** — see finding 6.
+2. **Full-depth press fit** — even with clearance, a plug spanning the full
+   1.2 mm artwork band asks the island to be a friction-fit mechanical joint,
+   which is not what the artwork needs. It only needs to be *positioned*.
 
-Whether it is correct *in practice* is a Bambu Studio question, and it is the
-second thing worth watching physically. If a boundary allowance turns out to be
-needed, it belongs in export as a per-slicer profile, **not** in the canonical
-model — putting it in the model would break the shared-boundary invariant this
-spike exists to establish.
+**Direction agreed with Andy (to be investigated next, deliberately not
+implemented in this spike):**
+
+1. A continuous structural backing remains underneath the entire artwork.
+2. Main colour bodies sit on that backing.
+3. Where an enclosed island needs positioning, the surrounding colour body
+   carries a **shallow registration recess**, not a through-hole.
+4. The recess is larger than the inserted piece by a **configurable
+   manufacturing clearance**.
+5. The recess is an assembly and positioning guide, **not a friction fit**.
+6. Final pieces are glued to the backing.
+7. Canonical artwork geometry stays exact; registration clearance is **derived
+   fabrication geometry** and must not alter canonical topology.
+
+This reframes the island from a structural part to a located inlay, and moves the
+mechanical job from press fit to adhesive.
+
+**Open geometry questions this raises**, worth settling before implementation:
+
+- **Recess depth versus island thickness.** If the recess is shallow, its floor
+  is B material, so the island rests on **B rather than on the backing** — a
+  change from the spike, where C sat directly on A. Is the island then thinner
+  than the artwork band, sized to the recess depth so its top finishes flush?
+- **Which surface is the datum?** Flush top surface and seating on the recess
+  floor are only simultaneously satisfiable if island thickness and recess depth
+  are derived from one another.
+- **Where clearance is applied.** Growing the recess, shrinking the island, or
+  splitting the allowance between them are three different fabrication
+  strategies with different visible gap sizes on the finished piece.
+- **Does the recess floor need its own minimum thickness rule?** It is now a
+  thin horizontal web of B, subject to the same manufacturability limits as any
+  other feature.
+
+### 6. Exact coincidence is canonical; clearance is derived — CONFIRMED by physical testing
+
+**Original position:** B and C meet at mathematically identical coordinates. Any
+boundary allowance belongs in export as a per-slicer profile, never in the
+canonical model, because putting it in the model would break the shared-boundary
+invariant the spike exists to establish.
+
+**The print confirmed both halves of this.** Zero clearance is correct for
+canonical geometry — the shared boundary validated at 0.0 mm² gap and overlap,
+and the bodies sliced without a single repair warning. Zero clearance is also
+unusable for physical assembly, as the island demonstrated.
+
+The architectural split therefore holds and is now evidence-backed:
+
+- **Canonical model:** exact coincident boundaries. Unchanged. This is what makes
+  shared boundaries checkable and keeps Layercake slicer-agnostic.
+- **Fabrication geometry:** derived at export by applying a configurable
+  clearance. Never fed back into the canonical model.
+
+The clearance value is a manufacturing parameter — a function of nozzle, material,
+printer and tolerance appetite — which is precisely why it belongs in an export
+profile rather than the artwork. Its value is not yet established; the spike only
+proves that zero is wrong.
 
 ### 7. Issue #1's reflex-vertex requirement was geometrically unsatisfiable as written
 
@@ -204,46 +304,66 @@ genuine 3D check.
 
 ### The 0.4 mm minimum feature width is an assumption, not a measurement
 
-Taken from the nozzle diameter per the issue. Whether 0.4 mm is the right
-threshold — and whether removal is the right action versus enlargement — is
-exactly what physical validation should inform.
+Taken from the nozzle diameter per the issue. The print did not exercise it: the
+tab was removed before export, so the threshold's correctness was never put to a
+physical test. Whether 0.4 mm is right, and whether removal beats enlargement,
+remains provisional.
 
 ---
 
 ## Open questions for Andy and Elara
 
-1. **Minimum-feature policy.** Removal is implemented per Andy's Session 0
-   decision. Is silent removal right for production, or should it be surfaced to
-   the user with a choice (remove / enlarge / keep and warn)? A tab that is
-   decorative and a tab that is structural want different answers.
-2. **Boundary allowance.** Should export gain an optional per-slicer clearance
-   profile, or stay at exact coincidence? Depends on the Bambu Studio result.
-3. **Island anchoring.** Is adhesion-only anchoring acceptable, or should
-   Layercake generate mechanical keying for small islands? Depends on the print.
+1. **Clearance value and strategy.** How much clearance, and applied where —
+   grow the recess, shrink the island, or split the allowance? This is now a
+   live question rather than a hypothetical one.
+2. **Recess geometry.** The four questions listed under finding 5: recess depth
+   versus island thickness, which surface is the datum, where clearance is
+   applied, and whether the recess floor needs its own minimum-thickness rule.
+3. **Minimum-feature policy.** Removal is implemented per Andy's Session 0
+   decision, and the print did not test the threshold. Is silent removal right
+   for production, or should it be surfaced to the user with a choice
+   (remove / enlarge / keep and warn)? A decorative tab and a structural one
+   want different answers.
 4. **Independent mesh validation.** Worth adding a second validator to
    cross-check self-intersection results before this becomes production
    architecture?
 
 ---
 
-## Not verified in this spike
+## Verified by physical validation
 
-- **Bambu Studio import/slice evidence** — requires Andy's validation slicer.
-  The STLs are in `artefacts/`; the check is that all three import at the correct
-  shared position and slice with no geometry-repair warnings.
-- **Physical print photograph and observations** — requires a physical print.
-  Watch particularly: boundary quality between B and C, whether the island is
-  mechanically secure, and that the removed tab leaves a sensible edge.
+Both outstanding items are now complete.
 
-Until both are done, the verdict above covers the geometry pipeline only.
+- **Bambu Studio import/slice evidence** — done. All three bodies imported at the
+  correct shared position, no geometry-repair warnings, sliced successfully.
+- **Physical print and observations** — done. Backing and foreground printed
+  cleanly; the island would not fit its zero-clearance opening.
+
+## Still not verified
+
+- **Self-intersection results have not been independently corroborated.** The
+  slicer reporting no repair warnings is meaningful supporting evidence — a real
+  production slicer found nothing wrong with the meshes — but Bambu Studio is not
+  a mesh validator and this is not a substitute for cross-checking against
+  MeshLab, admesh or Netfabb.
+- **The 0.4 mm minimum feature threshold** was not physically exercised.
+- **The recess construction model is unbuilt and untested.** It is a direction
+  agreed from a sketch, not a validated design.
 
 ---
 
 ## Recommendation
 
 Proceed to application architecture on this topology model. Carry findings 1–3
-into the design as invariants rather than conventions. Revisit DCEL only if one
-of these arrives:
+into the design as invariants rather than conventions.
+
+**Next piece of work, separate from this spike:** a fabrication-geometry stage
+that derives registration recesses and clearance from the canonical model at
+export time. The canonical topology proved out here is unaffected by it — that is
+the point of keeping clearance out of the model — so this is additive work rather
+than a rework. It is deliberately **not** implemented in PR #2.
+
+Revisit DCEL only if one of these arrives:
 
 - interactive region editing, where incremental local updates beat rebuilding
   the partition;
