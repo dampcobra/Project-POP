@@ -54,13 +54,27 @@ so this is additive work, not rework.
 problems — no clearance, and asking the island to be a friction-fit joint when it
 only needs positioning.
 
-**Direction agreed, deliberately NOT implemented in this PR:** continuous backing
-under the whole artwork, main colour bodies on the backing, a **shallow
-registration recess** in the surrounding body rather than a through-hole, sized
-larger than the insert by a configurable clearance, acting as a positioning guide
-rather than a friction fit, with pieces glued. Canonical artwork geometry stays
-exact; clearance is derived at export. Recorded as intent in ADR 0001 decision 8,
-with the open geometry questions it raises.
+**Replacement concept — shallow registration recesses. Deliberately NOT
+implemented in this PR; it belongs in a subsequent spike.**
+
+A supporting body carries a shallow pocket locating the piece assembled on top of
+it, sized with a configurable XY fabrication clearance, acting as an assembly
+guide for glue-up rather than a friction fit or interlock. This **generalises**:
+the backing may locate the main artwork body, and the main body may locate an
+island. It is not an island-only mechanism.
+
+**The finished artwork remains a flat mosaic.** Every colour's visible top
+surface finishes at the same nominal Z. A recess is a seating feature *below* the
+visible surface; the piece is made thicker by exactly the depth it seats, so
+`thickness = visible artwork height + seating depth`. Illustrative stack-up —
+concept, not production defaults: 0.8 mm backing, 0.8 mm visible artwork, 0.2 mm
+recess, 1.0 mm inserted piece finishing flush. **No variable relief is
+introduced.**
+
+The structural backing stays continuous; recesses never become full-depth holes.
+Canonical artwork boundaries stay mathematically exact — recess clearance is
+derived fabrication geometry only. Recorded as Product Owner intent in ADR 0001
+decision 8, with the open questions it raises.
 
 ## What is here
 
@@ -163,11 +177,8 @@ badge, island sitting proud in its opening) and `docs/spike-01/recess-concept.jp
 1. **Clearance value and strategy** — how much, and applied where (grow the
    recess, shrink the island, or split the allowance)? Now live rather than
    hypothetical.
-2. **Recess geometry** — recess depth as an independent parameter, and whether
-   the recess floor needs its own minimum-thickness rule. Note the sketch shows
-   the island resting on the surrounding body rather than the backing, and
-   **standing proud rather than flush** — which puts the current single-flat-band
-   assumption up for revision.
+2. **Recess parameters** — depth, XY clearance and minimum supporting thickness,
+   all requiring physical experimentation in the next spike.
 3. **Minimum-feature policy** — the print did not test the 0.4 mm threshold. Is
    silent removal right, or should the user get a choice?
 4. Add an independent mesh validator to cross-check self-intersection results?

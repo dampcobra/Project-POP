@@ -16,6 +16,7 @@
 |---|---|
 | 2026-09-04 | Accepted on software evidence. Decisions 7–8 provisional pending physical validation. |
 | 2026-09-04 | Physical validation complete. **Spike 01 marked PASS.** Decisions 1–7 confirmed; decision 6 strengthened with print evidence; **decision 8 revised** — full-depth zero-clearance island insertion rejected by physical testing. |
+| 2026-09-04 | Decision 8 restated to Product Owner intent: finished artwork is **flat mosaic with flush top surfaces**; registration recesses generalise to any supporting body, not islands only. Corrects an earlier reading of the freehand sketch that implied proud islands. **No variable relief is adopted.** |
 
 Revision is permitted here because decision 8 was recorded as explicitly
 provisional pending this evidence. Decisions 1–7 are unchanged in substance;
@@ -200,7 +201,7 @@ is **not cross-checked against an independent validator**, is O(n²), and treats
 touching as non-intersecting. Adding a second validator before this informs
 production architecture is an open question.
 
-### 8. Full-depth zero-clearance island insertion is REJECTED. Registration recesses to be investigated. — REVISED 2026-09-04
+### 8. Full-depth zero-clearance insertion is REJECTED. Shallow registration recesses to be investigated. — REVISED 2026-09-04
 
 **Previously (superseded):** an enclosed island exported as an independent body
 rests on the backing over 100 % of its footprint, held by inter-layer adhesion
@@ -219,63 +220,87 @@ The rejected model bundled two separate problems:
    artwork band asks the island to be a friction-fit mechanical joint. The
    artwork only needs the island to be *positioned*.
 
-#### Direction to investigate next
+#### Replacement concept to investigate next — shallow registration recesses
 
-Agreed with Andy from the physical result and a construction sketch. **Recorded
-as intent, not as an accepted design — it is unbuilt and untested, and is
-deliberately not implemented in PR #2.**
+Product Owner intent following physical validation. **Recorded as intent, not as
+an accepted design — it is unbuilt and untested, and is deliberately not
+implemented in PR #2.**
 
-1. A continuous structural backing remains underneath the entire artwork.
-2. Main colour bodies sit on that backing.
-3. Where an enclosed island needs positioning, the surrounding colour body
-   carries a **shallow registration recess**, not a through-hole.
-4. The recess is larger than the inserted piece by a **configurable manufacturing
-   clearance**.
-5. The recess is an assembly and positioning guide, **not a friction fit**.
-6. Final pieces are glued to the backing.
-7. **Canonical artwork geometry remains exact.** Registration clearance is
-   derived fabrication geometry and must not alter canonical topology.
+1. The structural backing remains continuous. Registration recesses must never
+   become **full-depth holes**.
+2. A recess is slightly larger in XY than the piece it locates, by a
+   **configurable fabrication clearance**.
+3. **Canonical artwork boundaries remain mathematically exact.** Recess clearance
+   belongs only to derived fabrication geometry.
+4. Piece thickness and seating depth are related: an inserted piece must include
+   the material that sits inside its recess, so its visible top surface finishes
+   at the intended common artwork Z height.
+5. The finished MVP artwork remains a **flat mosaic**. This does **not**
+   introduce variable relief.
+6. Recess depth, XY clearance and minimum supporting thickness are fabrication
+   parameters still requiring physical experimentation. Any figures quoted here
+   illustrate the concept rather than establish production defaults.
+7. **Not to be implemented in PR #2.** Investigate in a subsequent spike.
 
-Point 7 is the load-bearing constraint and is simply decision 6 restated for this
-case. The recess model changes what is *derived at export*; it must not change
-what the canonical model holds.
+Principles 3 and 5 are load-bearing and are decision 6 restated for this case.
+The recess model changes what is *derived at export*; it must not change what the
+canonical model holds, and the finished artwork stays a flat mosaic of exact
+boundaries.
 
 This reframes an island from a structural part to a located inlay, moving the
 mechanical job from press fit to adhesive.
 
-#### What the construction sketch settles
+#### The finished surface stays flat mosaic
 
-From [`recess-concept.jpg`](../spike-01/recess-concept.jpg), a cross-section
-through the badge:
+Product Owner clarification, authoritative over any reading of the freehand
+sketch:
 
-- Backing continuous and full width; the main colour body sits on it, also full
-  width. **No through-hole.**
-- The recess is a shallow pocket in the *top* of the main colour body, so its
-  floor is main-body material. The island rests on **that body, not on the
-  backing** — a change from the spike, where the island sat directly on the
-  backing.
-- **The island stands proud of the surrounding colour**, not flush: only its
-  lower portion seats in the pocket. Island thickness therefore exceeds recess
-  depth, and the artwork gains visible relief at island boundaries.
+**The MVP finished artwork remains a flat mosaic.** Every artwork colour's
+visible top surface finishes at the same nominal Z height. Registration recesses
+do **not** introduce variable relief, and no proud or raised island is adopted.
 
-#### Open geometry questions before implementation
+A recess is a seating feature *below* the visible surface, not a change *to* the
+visible surface. A piece is made thicker by exactly the depth it seats, so what
+shows above the surrounding artwork is unchanged:
 
-- **Recess depth as an independent parameter.** No longer derived from island
-  thickness, so it needs its own rule — deep enough to locate reliably, shallow
-  enough to leave a sound floor.
-- **Where is clearance applied?** Growing the recess, shrinking the island, or
-  splitting the allowance are three different strategies with different visible
-  gap widths on the finished piece.
-- **Does the recess floor need its own minimum-thickness rule?** It becomes a
-  thin horizontal web subject to the same manufacturability limits as any other
-  feature — and unlike a vertical wall it is a printed floor spanning a cavity.
-- **What bonds to what?** Point 6 says pieces are glued to the backing, but
-  geometrically the island bonds to the recess floor, which is main-body
-  material. Worth confirming that is intended.
-- **Does a raised island change the colour model?** Standing proud means the
-  artwork is no longer strictly flat mosaic within one band. Still
-  fixed-height-per-region rather than variable relief, but the "single artwork
-  band" assumption in the current geometry spec would need revisiting.
+> **piece thickness = visible artwork height + its seating depth**
+
+Illustrative stack-up — concept, **not** production defaults (see principle 6):
+
+| Element | Value |
+|---|---|
+| Structural backing | 0.8 mm |
+| Visible artwork height | 0.8 mm |
+| Registration recess depth | 0.2 mm |
+| Inserted piece thickness | 1.0 mm (0.2 mm seated + 0.8 mm visible) |
+| Finished top surface | flush with the surrounding artwork |
+
+#### Recesses generalise — not an island-only mechanism
+
+A shallow registration recess is a property of **any supporting body locating a
+separately assembled piece above it**, not a special case for enclosed islands:
+
+- the structural backing may carry a recess locating the main artwork body;
+- the main artwork body may carry a recess locating an enclosed island.
+
+Their purpose is assembly registration and glue-up — not friction fitting, not
+mechanical interlocking.
+
+#### Open questions for the next spike
+
+- **Where is clearance applied?** Growing the recess, shrinking the piece, or
+  splitting the allowance are three strategies with different visible gap widths
+  on the finished piece.
+- **Minimum supporting thickness.** A recess floor is a printed horizontal web
+  spanning a cavity — a different manufacturability case from a vertical wall.
+  Principle 1 requires the floor to exist; principle 6 leaves its thickness open.
+- **Principle 4 through a chain of seatings.** Thickness is measured from the
+  common artwork top Z down to that piece's own recess floor. A piece seated in a
+  body that is itself seated has a higher recess floor and is correspondingly
+  thinner than the single-seating illustration. Worth stating explicitly so the
+  illustrative 1.0 mm is not carried across to the nested case by assumption.
+- **What bonds to what?** Geometrically a located piece's bond face is its recess
+  floor in the supporting body.
 
 #### Minimum-feature policy — still provisional
 
@@ -324,7 +349,8 @@ arrives.
 - **Export clearance profiles — no longer optional.** Physical validation showed
   zero-clearance assembly does not work, so a fabrication-geometry stage is now
   required work rather than a contingency (decisions 6 and 8).
-- **Registration recess model** — direction agreed, unbuilt and untested
+- **Registration recess model** — Product Owner intent, unbuilt and untested,
+  generalised across supporting relationships rather than island-only
   (decision 8).
 - Resolution of the minimum-feature policy, which the print did not exercise
   (decision 8).
@@ -355,7 +381,13 @@ replaces it is recorded as intent to investigate, not as an accepted design.
 The minimum-feature policy within decision 8 remains provisional and untested.
 
 Photographic evidence is committed alongside the spike documentation:
-[`physical-print.jpg`](../spike-01/physical-print.jpg) (the printed badge with
-the island sitting proud in its opening) and
-[`recess-concept.jpg`](../spike-01/recess-concept.jpg) (Andy's cross-section
-sketch of the proposed construction).
+[`physical-print.jpg`](../spike-01/physical-print.jpg) (the printed badge, island
+resting unseated on its opening) and
+[`recess-concept.jpg`](../spike-01/recess-concept.jpg) (freehand cross-section of
+the proposed construction).
+
+The freehand sketch is indicative only. Where its proportions and the Product
+Owner clarification differ, **the clarification governs**. A revised annotated
+cross-section is expected and is **not yet in the repository**; add it as
+`docs/spike-01/recess-concept-annotated.jpg` and reference it here when
+available.
