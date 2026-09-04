@@ -2,7 +2,7 @@
 
 **Issue:** [dampcobra/Project-POP#3](https://github.com/dampcobra/Project-POP/issues/3)
 **Date:** 2026-09-04
-**Status:** Round 1 physically validated — **concept PASS**. Round 2 (depth sweep) artefacts ready to print.
+**Status:** Physically validated, both rounds. **Concept PASS**; provisional measured default recess depth **0.80 mm**.
 
 Architecture is recorded in [ADR 0002](../adr/0002-layered-relief-registration-recesses.md).
 Andy's observation sheet is generated as `artefacts/spike02/spike02-report.md`.
@@ -10,7 +10,7 @@ Andy's observation sheet is generated as `artefacts/spike02/spike02-report.md`.
 ## Running it
 
 ```bash
-.venv/Scripts/python.exe -m pytest                    # 163 tests
+.venv/Scripts/python.exe -m pytest                    # 170 tests
 .venv/Scripts/python.exe -m layercake_spike.spike02   # writes artefacts/spike02/
 ```
 

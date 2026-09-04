@@ -1,7 +1,7 @@
 # ADR 0002 — Layered-relief construction and registration recesses
 
-- **Status:** Accepted for the software model; the fabrication parameters it
-  carries remain provisional pending Spike 02 physical validation
+- **Status:** Accepted. Physically validated; fabrication parameters recorded as
+  **provisional measured defaults** scoped to the tested process
 - **Date:** 2026-09-04
 - **Session:** 0 — Product Definition & MVP
 - **Deciders:** Andy (Product Owner), Elara/ChatGPT (PM & Architect), Claude (Developer)
@@ -10,6 +10,13 @@
 - **Related:** [Issue #3](https://github.com/dampcobra/Project-POP/issues/3) ·
   [Issue #1](https://github.com/dampcobra/Project-POP/issues/1) ·
   `docs/spike-02/notes.md`
+
+### Revision history
+
+| Date | Change |
+|---|---|
+| 2026-09-04 | Accepted on the software model; parameters provisional pending physical validation. |
+| 2026-09-04 | **Physically validated.** Round 1: concept PASS; D = 0.20 mm too shallow. Round 2 (depth sweep): **D = 0.80 mm recorded as the provisional measured default**. Clearance remains a *held* process-floor value, not a measured optimum. New decision 8 records the measured parameters and their scope. |
 
 ## Context
 
@@ -155,9 +162,66 @@ recorded alongside any measurement:
   the foot alone can exceed the gap. No chamfers are applied in Spike 02; the
   compensation value used is recorded as an experimental condition instead.
 
-Recess depth, XY clearance and minimum supporting thickness remain **fabrication
-parameters requiring physical experimentation**. Figures used in Spike 02
-illustrate the concept; they are not production defaults.
+Recess depth, XY clearance and minimum supporting thickness are **fabrication
+parameters established by physical experimentation**, not by analysis. The
+measured values are recorded in decision 8.
+
+### 8. Provisional measured parameters (Spike 02, physical)
+
+**Recess depth: 0.80 mm.** Measured, provisional.
+
+Round 1 found 0.20 mm too shallow and 0.40 mm better but still wanting. Round 2
+swept 0.40 / 0.60 / 0.80 / 1.00 mm with clearance held and three replicates per
+depth. Andy's assessment: 0.80 mm gives the best balance of positive guidance,
+resistance to rocking and tilting, and easy removal before glue. 0.40 and 0.60
+are usable but feel less positively located; 1.00 is deeper than necessary and
+does not improve handling enough to justify it.
+
+**Scope of that number.** Measured for one process: Bambu P1S, 0.20 mm layer
+height, 0.15 mm elephant-foot compensation, 12 x 12 mm square seating footprint.
+It is a provisional default for that process, **not a universal constant**.
+
+**Expressed in layers it is 4 engaged, 3 of them printed under normal
+conditions.** Round 1 showed the 0.20 mm failure was that the recess engaged only
+the first printed layer, which carries squish, elephant-foot compensation and
+bed-levelling error. If engagement count is the governing mechanism, preferred
+depth scales with layer height rather than being fixed in millimetres -- 0.64 mm
+at 0.16 mm layers, 1.12 mm at 0.28 mm. **That is a hypothesis implied by the
+data, not a tested result**; only the 0.20 mm case has been measured. Recorded
+because it is the form likelier to transfer, and flagged because it has not been
+checked.
+
+**XY clearance: 0.05 mm, HELD -- not a measured optimum.** This is deliberately
+weaker language than the depth result carries. Round 1 could not resolve
+clearance: all six matrix children were the same nominal square, yet nominally
+identical prints felt different, so process variation is at least as large as the
+ladder step. Round 2 held it fixed and therefore says nothing new about it.
+"0.05 mm preferred" reads most honestly as *"everything available was loose; the
+tightest was least bad."* Treat it as the process floor to build at, and do not
+tune against it at finer resolution without an experiment that can resolve it.
+
+**Consequence: the structural backing must be decoupled from H in the product.**
+
+At H = 0.8 mm the *artwork* backing cannot host a 0.80 mm recess -- the floor
+would be zero and the pipeline correctly refuses it as a through-hole. Adopting
+this default therefore requires the backing to be thicker than the visible step
+height, not only in the test fixture:
+
+| Backing | Floor under a 0.80 mm recess |
+|---|---|
+| 0.8 mm (= H) | 0.00 mm -- rejected |
+| 1.2 mm | 0.40 mm (2 layers) -- minimum |
+| 1.6 mm | 0.80 mm (4 layers) |
+
+This is consistent with the backing already being defined as a structural member,
+conceptually independent of the visible artwork colours (Issue #1). Visible step
+heights are unaffected; only the base thickness and therefore the overall stack
+height change. **Middle bodies need no change** -- their thickness is `H + D`, so
+it grows with depth and their floor stays at H regardless.
+
+**Acceptance target used.** Positive registration during normal glue-up
+handling -- not dry retention, and not a friction fit. Depth buys retention and
+tilt resistance; XY accuracy is set by clearance and is unchanged by depth.
 
 ---
 
@@ -187,8 +251,14 @@ illustrate the concept; they are not production defaults.
 
 **Deferred**
 
-- Provisional default XY clearance and recess depth — pending physical results.
-- Minimum supporting thickness as a production rule.
+- **A clearance value established by measurement** rather than held at the
+  process floor. Needs an experiment whose resolution beats process variation,
+  which the two rounds so far did not have.
+- **Whether the depth result transfers as millimetres or as layers.** Only the
+  0.20 mm layer-height case has been measured.
+- Minimum supporting thickness as a general production rule (1.2 mm is the
+  minimum for the measured default, not a derived rule).
+- The S1/S2 corner-binding question, which both rounds left confounded.
 - Flat/inlay mode and its separating-land problem (decision 6).
 - Translucent-material behaviour (decision 2).
 - Cumulative registration error.
@@ -219,10 +289,13 @@ ADR 0001 remains historically accurate and is **not** rewritten. Specifically:
 | Clearance present numerically, canonical unmutated | Verified in software |
 | Support continuous beneath every recess | Verified in software |
 | Meshes manifold | Verified by the Spike 01 validator, with its stated limitations |
-| Slicer import/slice evidence | **Outstanding — Andy (printer occupied)** |
-| Physical fit, registration, seating, step height, recess quality | **Outstanding — Andy** |
+| Slicer import/slice evidence | **Complete** — imported, sliced, printed |
+| Physical fit, registration, handling (round 1) | **Complete** — concept PASS; D = 0.20 mm too shallow |
+| Recess depth sweep (round 2) | **Complete** — D = 0.80 mm preferred |
+| XY clearance as a measured value | **Not established** — held at the process floor; neither round could resolve it |
+| Corner binding (S1/S2) | **Not established** — confounded in both rounds |
 
-Decisions 1–6 stand on the software model and on the Spike 01 physical result
-that motivated them. The **parameter values** they carry — clearance, depth,
-supporting thickness — are provisional until Spike 02's physical validation is
-complete, at which point this ADR should be revised with the measured defaults.
+Decisions 1–7 stand on the software model and on physical validation.
+Decision 8's depth value is a **measured, provisional default scoped to the
+tested process**; its clearance value is **held, not measured**, and the two
+should not be read with equal confidence.

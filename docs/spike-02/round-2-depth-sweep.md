@@ -1,8 +1,10 @@
 # Spike 02 round 2 — depth-only follow-up
 
+**Result: `D = 0.80 mm` is the provisional measured default recess depth.**
+
 Round 1 settled the concept and left one question: **how deep should a
 registration recess be?** Andy preferred more depth at every level tested, so
-this round sweeps depth alone.
+this round swept depth alone. It is answered below.
 
 Continues [`notes.md`](notes.md). Architecture: [ADR 0002](../adr/0002-layered-relief-registration-recesses.md).
 Andy's observation sheet is generated as
@@ -138,6 +140,73 @@ quietly open mesh.
 `artefacts/spike02/depth-followup/` — fixture, 12 children, co-registered
 assembly, plate layout (230 × 51 mm), debug SVG, validation report, parameters
 JSON, and `depth-followup-report.md` as the observation sheet.
+
+## Round 2 physical result
+
+Andy, Bambu P1S, 0.20 mm layer height, 0.15 mm elephant-foot compensation, dry
+assembly.
+
+| Depth (mm) | Verdict |
+|---|---|
+| 0.40 | Usable, less positively located |
+| 0.60 | Usable, less positively located |
+| **0.80** | **PREFERRED** — best balance of positive guidance, resistance to rocking/tilting, and easy removal before glue |
+| 1.00 | Deeper than necessary; no worthwhile handling gain |
+
+**Recorded as the provisional measured default: 0.80 mm.**
+
+### Scope of that number
+
+Measured for **one process**: Bambu P1S, 0.20 mm layer height, 0.15 mm
+elephant-foot compensation, 12 × 12 mm square seating footprint. A provisional
+default for that process, **not a universal constant**.
+
+### In layers — the form likelier to transfer
+
+0.80 mm at 0.20 mm layers is **4 layers engaged, 3 printed under normal
+conditions**. Round 1 showed the 0.20 mm failure was that the recess engaged only
+the first printed layer. If engagement count is the governing mechanism,
+preferred depth scales with layer height:
+
+| Layer height | 4-layer equivalent |
+|---|---|
+| 0.12 mm | 0.48 mm |
+| 0.16 mm | 0.64 mm |
+| **0.20 mm** | **0.80 mm — measured** |
+| 0.28 mm | 1.12 mm |
+
+**This is a hypothesis implied by the data, not a tested result.** Only the
+0.20 mm case has been measured. Recorded because it is the practically useful
+form, and flagged because it has not been checked.
+
+### Clearance is still not a measured value
+
+`0.05 mm` remains a **held process-floor value, not a proven fine-resolution
+optimum.** Round 1 could not resolve clearance — nominally identical children
+felt different, so process variation is at least as large as the ladder step —
+and round 2 held it fixed. Neither round measured it.
+
+Deliberately weaker language than the depth result carries: the two should not be
+read with equal confidence.
+
+### Consequence: the artwork backing must be decoupled from H
+
+At `H = 0.8 mm` the **artwork** backing cannot host a 0.80 mm recess — the floor
+would be zero and the pipeline refuses it as a through-hole. Adopting this
+default requires the structural backing to be thicker than the visible step
+height in the *product*, not only in the test fixture:
+
+| Backing | Floor under a 0.80 mm recess |
+|---|---|
+| 0.8 mm (= H) | 0.00 mm — rejected |
+| 1.2 mm | 0.40 mm (2 layers) — minimum |
+| 1.6 mm | 0.80 mm (4 layers) |
+
+Consistent with the backing already being a structural member conceptually
+independent of the visible artwork colours (Issue #1). Visible step heights are
+unaffected — only base thickness and overall stack height change. **Middle bodies
+need no change**: their thickness is `H + D`, so it grows with depth and their
+floor stays at `H` regardless.
 
 ## Limitations of this round
 

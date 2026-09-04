@@ -169,3 +169,53 @@ def test_derived_support_inspection_finds_no_real_thin_feature(built):
 def test_coupon_fits_the_bed(built):
     lo, hi = built.fixture_mesh.bounds
     assert (hi[0] - lo[0]) <= 250.0 and (hi[1] - lo[1]) <= 250.0
+
+
+# --- recorded round-2 result -------------------------------------------------
+
+
+def test_measured_default_depth_is_recorded():
+    assert params.MEASURED_DEFAULT_DEPTH_MM == 0.80
+    assert params.MEASURED_DEFAULT_DEPTH_MM in params.DEPTH_FOLLOWUP_DEPTHS
+    assert _is_layer_multiple(params.MEASURED_DEFAULT_DEPTH_MM)
+
+
+def test_measured_default_expressed_in_layers_matches_the_millimetre_value():
+    assert params.MEASURED_DEFAULT_DEPTH_LAYERS == round(
+        params.MEASURED_DEFAULT_DEPTH_MM / params.LAYER_HEIGHT_MM
+    )
+
+
+def test_clearance_is_recorded_as_held_not_measured():
+    assert params.HELD_CLEARANCE_MM == params.DEPTH_FOLLOWUP_CLEARANCE_MM
+
+
+def test_the_artwork_backing_cannot_host_the_measured_default():
+    """Adopting D=0.80 forces the structural backing to be decoupled from H."""
+    from layercake_spike.spike02 import fabricate
+
+    at_h = fabricate.check_floor(
+        "backing", "child", params.STACK_BACKING_MM, params.MEASURED_DEFAULT_DEPTH_MM
+    )
+    assert not at_h.ok, "a 0.8 mm backing would leave no floor under a 0.80 mm recess"
+
+    at_min = fabricate.check_floor(
+        "backing",
+        "child",
+        params.MIN_BACKING_FOR_DEFAULT_DEPTH_MM,
+        params.MEASURED_DEFAULT_DEPTH_MM,
+    )
+    assert at_min.ok
+    # 1.2 - 0.8 is 0.39999999999999991 in binary floating point, so compare with
+    # a tolerance rather than letting representation error fail a real check
+    assert at_min.floor_mm >= 2 * params.LAYER_HEIGHT_MM - 1e-9
+
+
+def test_middle_bodies_need_no_change_for_the_measured_default():
+    """A middle body's thickness is H + D, so its floor is unaffected by D."""
+    from layercake_spike.spike02 import fabricate
+
+    d = params.MEASURED_DEFAULT_DEPTH_MM
+    f = fabricate.check_floor("red", "island", params.child_thickness(d), d)
+    assert f.ok
+    assert math.isclose(f.floor_mm, params.H_VISIBLE_STEP_MM, abs_tol=1e-12)

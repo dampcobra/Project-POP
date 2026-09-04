@@ -591,6 +591,25 @@
       "dz": -0.0
     }
   ],
+  "measured_result": {
+    "status": "measured, provisional",
+    "default_recess_depth_mm": 0.8,
+    "default_recess_depth_layers": 4,
+    "assessment": "0.80 mm gives the best balance of positive guidance, resistance to rocking/tilting, and easy removal before glue. 0.40 and 0.60 are usable but feel less positively located; 1.00 is deeper than necessary and does not improve handling enough to justify it.",
+    "scope": "Measured for one process: Bambu P1S, 0.20 mm layer height, 0.15 mm elephant-foot compensation, 12 x 12 mm square seating footprint. A provisional default, not a universal constant.",
+    "layer_hypothesis": "Expressed in layers the result is 4 engaged, 3 of them printed under normal conditions. If engagement count is the governing mechanism the preferred depth scales with layer height (0.64 mm at 0.16 mm layers, 1.12 mm at 0.28 mm). That is a hypothesis implied by the data, NOT a tested result -- only the 0.20 mm case has been measured.",
+    "clearance_status": "0.05 mm remains a HELD process-floor value, not a proven fine-resolution optimum. Round 1 could not resolve clearance because process variation exceeded the ladder step, and round 2 held it fixed, so neither round measured it.",
+    "backing_consequence": {
+      "min_backing_mm": 1.2,
+      "note": "At H = 0.8 mm the artwork backing cannot host a 0.80 mm recess: the floor would be zero and the pipeline refuses it. Adopting this default requires the structural backing to be decoupled from H in the product, not only in the test fixture. Visible step heights are unaffected."
+    },
+    "per_depth": {
+      "0.40": "usable, less positively located",
+      "0.60": "usable, less positively located",
+      "0.80": "PREFERRED - best balance",
+      "1.00": "deeper than necessary; no worthwhile handling gain"
+    }
+  },
   "limitations": [
     "Recess variation is NOT replicated: one recess per depth. Only child variation is captured, by the three replicates.",
     "Clearance is held, not measured; this round says nothing new about it.",

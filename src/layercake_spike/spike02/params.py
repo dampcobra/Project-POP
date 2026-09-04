@@ -127,6 +127,47 @@ DEPTH_FOLLOWUP_REPLICATES: int = 3
 MARKER_DEPTH_MM: float = 0.4
 MARKER_SIZE_MM: float = 1.6
 
+# --- measured result (round 2) ----------------------------------------------
+
+#: Provisional measured default recess depth, from Spike 02 round 2.
+#:
+#: Andy's assessment: 0.80 mm gives the best balance of positive guidance,
+#: resistance to rocking/tilting, and easy removal before glue. 0.40 and 0.60 are
+#: usable but feel less positively located; 1.00 is deeper than necessary and
+#: does not improve handling enough to justify it.
+#:
+#: SCOPE. Measured for one process: Bambu P1S, 0.20 mm layer height, 0.15 mm
+#: elephant-foot compensation, PLA, 12 x 12 mm square seating footprint. It is a
+#: provisional default, not a universal constant.
+MEASURED_DEFAULT_DEPTH_MM: float = 0.80
+
+#: The same result expressed in layers, which is the form likelier to transfer.
+#:
+#: Round 1 showed the failure at 0.20 mm was that the recess engaged only the
+#: first printed layer. If engagement count is the governing mechanism, then the
+#: preferred depth scales with layer height rather than being fixed in mm --
+#: 0.64 mm at 0.16 mm layers, 1.12 mm at 0.28 mm. That is a **hypothesis implied
+#: by the data, not a tested result**; only the 0.20 mm case has been measured.
+MEASURED_DEFAULT_DEPTH_LAYERS: int = 4
+
+#: Minimum structural backing thickness needed to host the measured default.
+#:
+#: Consequence worth stating plainly: at H = 0.8 mm the *artwork* backing cannot
+#: host a 0.80 mm recess -- the floor would be zero and the pipeline refuses it.
+#: Adopting this default therefore requires the structural backing to be
+#: decoupled from H in the product, not just in the test fixture. 1.2 mm leaves a
+#: two-layer floor; 1.6 mm leaves four.
+MIN_BACKING_FOR_DEFAULT_DEPTH_MM: float = 1.2
+
+#: Clearance remains a HELD process-floor value, not a measured optimum.
+#:
+#: Round 1 could not resolve clearance: nominally identical children felt
+#: different, so process variation is at least as large as the ladder step.
+#: Round 2 held it fixed and therefore says nothing new about it. Recorded
+#: separately from the depth result so the two are not read with equal
+#: confidence.
+HELD_CLEARANCE_MM: float = 0.05
+
 # --- derived-geometry inspection --------------------------------------------
 
 #: Minimum feature width used when *inspecting* derived fabrication geometry.

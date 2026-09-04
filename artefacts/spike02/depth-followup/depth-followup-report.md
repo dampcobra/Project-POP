@@ -68,3 +68,26 @@ There are **3 identical children per depth**. Please test all three: spread betw
 
 - Self-intersection counts come from this project's own triangle-triangle checker, not from trimesh, which has no such test. That checker has not been cross-checked against an independent mesh validator, is O(n^2) in its broad phase, and treats touching faces as non-intersecting. Its evidential status is unchanged from Spike 01.
 - Recess dilation uses a round join, so clearance is radial. Clipper2 approximates each corner arc with chords, leaving the achieved clearance a sagitta short of nominal -- under 1 um at these radii, roughly 1000x finer than a 0.4 mm nozzle. Achieved values are measured and reported, not assumed.
+
+---
+
+# Result (measured)
+
+**Provisional default recess depth: 0.8 mm** (4 layers at 0.2 mm layer height).
+
+0.80 mm gives the best balance of positive guidance, resistance to rocking/tilting, and easy removal before glue. 0.40 and 0.60 are usable but feel less positively located; 1.00 is deeper than necessary and does not improve handling enough to justify it.
+
+| Depth (mm) | Verdict |
+|---|---|
+| 0.40 | usable, less positively located |
+| 0.60 | usable, less positively located |
+| 0.80 | PREFERRED - best balance |
+| 1.00 | deeper than necessary; no worthwhile handling gain |
+
+**Scope.** Measured for one process: Bambu P1S, 0.20 mm layer height, 0.15 mm elephant-foot compensation, 12 x 12 mm square seating footprint. A provisional default, not a universal constant.
+
+**Clearance.** 0.05 mm remains a HELD process-floor value, not a proven fine-resolution optimum. Round 1 could not resolve clearance because process variation exceeded the ladder step, and round 2 held it fixed, so neither round measured it.
+
+**In layers.** Expressed in layers the result is 4 engaged, 3 of them printed under normal conditions. If engagement count is the governing mechanism the preferred depth scales with layer height (0.64 mm at 0.16 mm layers, 1.12 mm at 0.28 mm). That is a hypothesis implied by the data, NOT a tested result -- only the 0.20 mm case has been measured.
+
+**Consequence for the artwork backing.** At H = 0.8 mm the artwork backing cannot host a 0.80 mm recess: the floor would be zero and the pipeline refuses it. Adopting this default requires the structural backing to be decoupled from H in the product, not only in the test fixture. Visible step heights are unaffected. Minimum backing for this default: 1.2 mm.

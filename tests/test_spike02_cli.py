@@ -191,3 +191,30 @@ def test_depth_followup_report_asks_the_right_question(built):
     assert "0.15 mm elephant-foot compensation" in text
     for d in (0.40, 0.60, 0.80, 1.00):
         assert f"| {d:.2f} |" in text
+
+
+def test_depth_followup_report_carries_the_measured_result(built):
+    out, _ = built
+    text = (out / "depth-followup" / "depth-followup-report.md").read_text(
+        encoding="utf-8"
+    )
+    assert "# Result (measured)" in text
+    assert "0.8 mm" in text
+    assert "PREFERRED" in text
+    # clearance must stay worded more cautiously than the depth result
+    assert "HELD process-floor value" in text
+    assert "not a tested result" in text.lower()
+    assert "cannot host a 0.80 mm" in text
+
+
+def test_depth_followup_summary_carries_the_measured_result(built):
+    out, _ = built
+    s = json.loads(
+        (out / "depth-followup" / "depth-followup-parameters.json").read_text()
+    )
+    mr = s["measured_result"]
+    assert mr["default_recess_depth_mm"] == 0.80
+    assert mr["default_recess_depth_layers"] == 4
+    assert mr["backing_consequence"]["min_backing_mm"] == 1.2
+    assert "not a universal constant" in mr["scope"]
+    assert "HELD" in mr["clearance_status"]

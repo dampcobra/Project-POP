@@ -89,3 +89,55 @@ size; the proposed 0.80 mm sweep would have been a through-hole in a 0.8 mm
 backing, fixed by thickening the fixture; and building the D.80 label exposed a
 latent two-collinear-holes bug in Spike 01 extrude, now guarded with a
 regression test. 163 tests green.
+
+---
+
+## Round 2 result — 0.80 mm
+
+Andy swept the four depths on the P1S at 0.20 mm layers with 0.15 mm
+elephant-foot compensation. **`D = 0.80 mm` is the sweet spot**: best balance of
+positive guidance, resistance to rocking and tilting, and easy removal before
+glue. 0.40 and 0.60 are usable but feel less positively located; 1.00 is deeper
+than necessary and does not earn its extra material.
+
+Recorded as the **provisional measured default**, scoped explicitly to the tested
+process. Not a universal constant — one printer, one layer height, one
+elephant-foot setting, one seating footprint.
+
+Bracketing the sweep to 1.00 mm was worth it. Every earlier round had ended with
+"I wish I had more", and this one did not: the answer is inside the range, so
+there is no third round.
+
+**Clearance wording deliberately kept weaker than the depth result.** 0.05 mm is
+a *held process-floor value*, not a proven fine-resolution optimum. Round 1 could
+not resolve it because process variation exceeded the ladder step, and round 2
+held it fixed. Neither round measured it. The two numbers now sit in the same ADR
+and it matters that they are not read with equal confidence.
+
+## The consequence nobody had spotted yet
+
+Adopting 0.80 mm has a product implication beyond the test fixture: **at
+`H = 0.8 mm` the artwork backing cannot host a 0.80 mm recess.** The floor would
+be zero and the pipeline refuses it as a through-hole — the same check that
+caught Elara's proposed 0.80 mm sweep earlier.
+
+So the structural backing has to be decoupled from the visible step height in the
+*product*, not only in the test fixture. 1.2 mm is the minimum for a two-layer
+floor; 1.6 mm gives four. Visible step heights are unaffected — only base
+thickness and overall stack height change. Middle bodies need nothing: their
+thickness is `H + D`, so it grows with depth and their floor stays at `H`.
+
+Consistent with the backing already being defined as a structural member
+conceptually independent of the visible artwork colours, so this is applying
+existing architecture rather than a new decision — but it does need saying out
+loud before anyone builds artwork on a 0.8 mm base.
+
+## Recorded in code, not just prose
+
+`MEASURED_DEFAULT_DEPTH_MM`, its layer-count equivalent, the minimum backing it
+implies, and `HELD_CLEARANCE_MM` all live in `params.py` with their provenance,
+so the generated JSON and the observation sheet carry the result too and it
+cannot drift silently. Five tests pin them, including one asserting that a 0.8 mm
+backing genuinely cannot host the default.
+
+170 tests green. ADR 0002 gains decision 8.

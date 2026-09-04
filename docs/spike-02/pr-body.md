@@ -1,11 +1,17 @@
 Implements the software portion of #3.
 
-**Do not merge** — the depth question is still open. Round 1 is physically
-validated; round 2 artefacts are ready to print.
+**Ready for final review.** Both physical rounds are complete.
 
-**Round 1 physical result: concept PASS.** Pieces guide into position without
-locking, and the three-level stack assembles. `D = 0.20 mm` too shallow,
-`0.40 mm` better, still wanting more — which is what round 2 answers.
+**Concept PASS.** Pieces guide into position without locking, and the three-level
+white → red → yellow stack assembles.
+
+**Provisional measured default recess depth: `D = 0.80 mm`** — best balance of
+positive guidance, resistance to rocking/tilting, and easy removal before glue.
+Scoped to the tested process (P1S, 0.20 mm layers, 0.15 mm elephant-foot
+compensation), not a universal constant.
+
+**XY clearance `0.05 mm` remains a HELD process-floor value, not a measured
+optimum** — deliberately weaker language than the depth result carries.
 
 ## What this is
 
@@ -18,7 +24,7 @@ white backing  ->  red enclosing colour  ->  yellow enclosed island
        0.8              1.6                        2.4 mm
 ```
 
-All software criteria pass; **163 tests green**, including Spike 01's 55
+All software criteria pass; **170 tests green**, including Spike 01's 55
 unchanged.
 
 | Criterion | Result |
@@ -222,13 +228,55 @@ have produced a quietly open mesh.
 assembly, plate layout (230 × 51 mm), debug SVG, validation report, parameters
 JSON, and `depth-followup-report.md` as the observation sheet.
 
-## Round 2 outstanding — Andy
+## Round 2 result
 
-- [ ] Print at **0.20 mm layers with 0.15 mm elephant-foot compensation** — same
-      as round 1, or comparability is lost.
-- [ ] Test all three replicates per depth.
-- [ ] Record against the acceptance target: **positive registration during normal
-      glue-up handling**, not dry retention and not a friction fit.
+| Depth (mm) | Verdict |
+|---|---|
+| 0.40 | Usable, less positively located |
+| 0.60 | Usable, less positively located |
+| **0.80** | **PREFERRED** — best balance |
+| 1.00 | Deeper than necessary; no worthwhile handling gain |
+
+Bracketing the sweep to 1.00 mm paid off: every earlier round ended with "I wish
+I had more", and this one did not, so the answer is inside the range.
+
+### In layers — the form likelier to transfer
+
+0.80 mm at 0.20 mm layers is **4 layers engaged, 3 printed under normal
+conditions**. If engagement count is the governing mechanism, preferred depth
+scales with layer height (0.64 mm at 0.16 mm layers, 1.12 mm at 0.28 mm).
+**Hypothesis implied by the data, not a tested result** — only 0.20 mm has been
+measured.
+
+### ⚠️ Consequence for the product: the backing must be decoupled from H
+
+At `H = 0.8 mm` the **artwork** backing cannot host a 0.80 mm recess — the floor
+would be zero and the pipeline refuses it as a through-hole. Adopting this
+default requires a thicker structural backing in the product, not only in the
+test fixture:
+
+| Backing | Floor under a 0.80 mm recess |
+|---|---|
+| 0.8 mm (= H) | 0.00 mm — rejected |
+| 1.2 mm | 0.40 mm (2 layers) — minimum |
+| 1.6 mm | 0.80 mm (4 layers) |
+
+Visible step heights are unaffected; only base thickness and overall stack height
+change. **Middle bodies need no change** — their thickness is `H + D`, so their
+floor stays at `H` regardless.
+
+Consistent with the backing already being a structural member conceptually
+independent of the visible artwork colours, so this applies existing architecture
+rather than being a new decision — but it needs saying before artwork is built on
+a 0.8 mm base.
+
+## Where the result is recorded
+
+In `params.py` with provenance (`MEASURED_DEFAULT_DEPTH_MM`, its layer-count
+equivalent, the implied minimum backing, and `HELD_CLEARANCE_MM`), so the
+generated JSON and observation sheet carry it and it cannot drift silently. Five
+tests pin it, including one asserting a 0.8 mm backing genuinely cannot host the
+default. ADR 0002 gains decision 8.
 
 ## Round 2 limitations
 

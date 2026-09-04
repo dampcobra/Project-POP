@@ -101,6 +101,52 @@ def build_followup_summary(result, mesh_reports, placements) -> dict:
         "plate_layout": [
             {"name": p.name, "dx": p.dx, "dy": p.dy, "dz": p.dz} for p in placements
         ],
+        "measured_result": {
+            "status": "measured, provisional",
+            "default_recess_depth_mm": params.MEASURED_DEFAULT_DEPTH_MM,
+            "default_recess_depth_layers": params.MEASURED_DEFAULT_DEPTH_LAYERS,
+            "assessment": (
+                "0.80 mm gives the best balance of positive guidance, resistance "
+                "to rocking/tilting, and easy removal before glue. 0.40 and 0.60 "
+                "are usable but feel less positively located; 1.00 is deeper than "
+                "necessary and does not improve handling enough to justify it."
+            ),
+            "scope": (
+                "Measured for one process: Bambu P1S, 0.20 mm layer height, "
+                "0.15 mm elephant-foot compensation, 12 x 12 mm square seating "
+                "footprint. A provisional default, not a universal constant."
+            ),
+            "layer_hypothesis": (
+                "Expressed in layers the result is 4 engaged, 3 of them printed "
+                "under normal conditions. If engagement count is the governing "
+                "mechanism the preferred depth scales with layer height (0.64 mm "
+                "at 0.16 mm layers, 1.12 mm at 0.28 mm). That is a hypothesis "
+                "implied by the data, NOT a tested result -- only the 0.20 mm "
+                "case has been measured."
+            ),
+            "clearance_status": (
+                "0.05 mm remains a HELD process-floor value, not a proven "
+                "fine-resolution optimum. Round 1 could not resolve clearance "
+                "because process variation exceeded the ladder step, and round 2 "
+                "held it fixed, so neither round measured it."
+            ),
+            "backing_consequence": {
+                "min_backing_mm": params.MIN_BACKING_FOR_DEFAULT_DEPTH_MM,
+                "note": (
+                    "At H = 0.8 mm the artwork backing cannot host a 0.80 mm "
+                    "recess: the floor would be zero and the pipeline refuses it. "
+                    "Adopting this default requires the structural backing to be "
+                    "decoupled from H in the product, not only in the test "
+                    "fixture. Visible step heights are unaffected."
+                ),
+            },
+            "per_depth": {
+                "0.40": "usable, less positively located",
+                "0.60": "usable, less positively located",
+                "0.80": "PREFERRED - best balance",
+                "1.00": "deeper than necessary; no worthwhile handling gain",
+            },
+        },
         "limitations": [
             "Recess variation is NOT replicated: one recess per depth. Only child "
             "variation is captured, by the three replicates.",
@@ -198,4 +244,36 @@ def followup_to_markdown(summary: dict) -> str:
     lines += [f"- {n}" for n in summary["limitations"]]
     lines += ["", "## Validation caveats", ""]
     lines += [f"- {n}" for n in summary["validation"]["tool_notes"]]
+
+    mr = summary.get("measured_result")
+    if mr:
+        lines += [
+            "",
+            "---",
+            "",
+            "# Result (measured)",
+            "",
+            f"**Provisional default recess depth: {mr['default_recess_depth_mm']} mm** "
+            f"({mr['default_recess_depth_layers']} layers at "
+            f"{summary['held_constant']['slicer_layer_height_mm']} mm layer height).",
+            "",
+            mr["assessment"],
+            "",
+            "| Depth (mm) | Verdict |",
+            "|---|---|",
+        ]
+        lines += [f"| {k} | {v} |" for k, v in mr["per_depth"].items()]
+        lines += [
+            "",
+            f"**Scope.** {mr['scope']}",
+            "",
+            f"**Clearance.** {mr['clearance_status']}",
+            "",
+            f"**In layers.** {mr['layer_hypothesis']}",
+            "",
+            "**Consequence for the artwork backing.** "
+            + mr["backing_consequence"]["note"]
+            + f" Minimum backing for this default: "
+            f"{mr['backing_consequence']['min_backing_mm']} mm.",
+        ]
     return "\n".join(lines) + "\n"
