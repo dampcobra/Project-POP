@@ -1,0 +1,179 @@
+{
+  "spike": "01 - canonical topology and manifold STL export",
+  "issue": "dampcobra/Project-POP#1",
+  "units": "mm",
+  "tolerances": {
+    "eps_mm": 1e-06,
+    "clipper_scale": 1000000.0,
+    "sliver_area_eps_mm2": 0.001
+  },
+  "criteria": {
+    "shared_boundaries": true,
+    "concave_geometry": true,
+    "island_containment": true,
+    "minimum_feature_handling": true,
+    "manifold_validity": true
+  },
+  "pass": true,
+  "band_validation": {
+    "backing": {
+      "band": [
+        0.0,
+        0.8
+      ],
+      "regions": [
+        "A"
+      ],
+      "overlap_area": 0.0,
+      "gap_area": 0,
+      "universe_area": 2500.0,
+      "covered_area": 2500.0,
+      "tolerance": 1e-06,
+      "ok": true
+    },
+    "artwork": {
+      "band": [
+        0.8,
+        2.0
+      ],
+      "regions": [
+        "B",
+        "C"
+      ],
+      "overlap_area": 0.0,
+      "gap_area": 0,
+      "universe_area": 965.9999930000005,
+      "covered_area": 965.9999930000005,
+      "tolerance": 1e-06,
+      "ok": true
+    }
+  },
+  "cleanup": {
+    "min_feature_mm": 0.4,
+    "policy": "detect, report, and remove deterministically before mesh generation",
+    "findings": [
+      {
+        "region": "B",
+        "kind": "thin_feature",
+        "detail": "feature thinner than 0.4 mm at x 44.000..47.000, y 15.425..15.575",
+        "area_mm2": 0.4500000000000455,
+        "min_feature_mm": 0.4,
+        "action": "removed"
+      }
+    ]
+  },
+  "island_anchoring": {
+    "C": {
+      "rests_on": "A",
+      "enclosed_by": [
+        "B"
+      ],
+      "contact_area_mm2": 64.0,
+      "own_area_mm2": 64.0,
+      "contact_fraction": 1.0,
+      "ok": true,
+      "note": "Island is exported as an independent body. It is held by resting on the backing over its whole footprint; there is no mechanical interlock, so adhesion to the backing is what secures it."
+    }
+  },
+  "validation": {
+    "tool": "trimesh (watertight/winding/euler) + project self-intersection checker",
+    "tool_notes": [
+      "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+      "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+    ],
+    "bodies": [
+      {
+        "body": "A",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 2000.0,
+        "face_count": 12,
+        "vertex_count": 8,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            50.0,
+            50.0,
+            0.8
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "B",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 0,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 1082.3999916000005,
+        "face_count": 60,
+        "vertex_count": 30,
+        "bounds": [
+          [
+            8.0,
+            6.0,
+            0.8
+          ],
+          [
+            44.0,
+            40.0,
+            2.0
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "C",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 76.8,
+        "face_count": 12,
+        "vertex_count": 8,
+        "bounds": [
+          [
+            14.0,
+            12.0,
+            0.8
+          ],
+          [
+            22.0,
+            20.0,
+            2.0
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      }
+    ]
+  },
+  "not_verified_here": [
+    "Bambu Studio import/slice evidence -- requires Andy's validation slicer.",
+    "Physical print observations -- requires a physical print.",
+    "Self-intersection results come from this project's own checker, since trimesh has no such test; it has not been cross-checked against an independent mesh validator."
+  ]
+}

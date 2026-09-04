@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="720" viewBox="0 0 720.000 720.000">
+<style>
+  .grid { stroke: #e2e2e2; stroke-width: 0.5; }
+  .grid-major { stroke: #c4c4c4; stroke-width: 1; }
+  .shared-edge { stroke: #d81b60; stroke-width: 3.5; stroke-linecap: round; }
+  .vertex { fill: #333; }
+  .reflex { fill: none; stroke: #d81b60; stroke-width: 1.6; }
+  text { font: 11px system-ui, sans-serif; fill: #333; }
+</style>
+<rect width="720.000" height="720.000" fill="#ffffff"/>
+<g class="grid-layer">
+<line class="grid" x1="-60.000" y1="0" x2="-60.000" y2="720.000"/>
+<line class="grid-major" x1="60.000" y1="0" x2="60.000" y2="720.000"/>
+<line class="grid" x1="180.000" y1="0" x2="180.000" y2="720.000"/>
+<line class="grid" x1="300.000" y1="0" x2="300.000" y2="720.000"/>
+<line class="grid" x1="420.000" y1="0" x2="420.000" y2="720.000"/>
+<line class="grid" x1="540.000" y1="0" x2="540.000" y2="720.000"/>
+<line class="grid-major" x1="660.000" y1="0" x2="660.000" y2="720.000"/>
+<line class="grid" x1="0" y1="780.000" x2="720.000" y2="780.000"/>
+<line class="grid-major" x1="0" y1="660.000" x2="720.000" y2="660.000"/>
+<line class="grid" x1="0" y1="540.000" x2="720.000" y2="540.000"/>
+<line class="grid" x1="0" y1="420.000" x2="720.000" y2="420.000"/>
+<line class="grid" x1="0" y1="300.000" x2="720.000" y2="300.000"/>
+<line class="grid" x1="0" y1="180.000" x2="720.000" y2="180.000"/>
+<line class="grid-major" x1="0" y1="60.000" x2="720.000" y2="60.000"/>
+</g>
+<path data-region="A" data-colour="A" data-z="0.0-0.8" d="M 60.000 660.000 L 660.000 660.000 L 660.000 60.000 L 60.000 60.000 Z" fill="#dfe6ee" fill-opacity="0.75" fill-rule="evenodd" stroke="#5b6b7f" stroke-width="1.4"/>
+<path data-region="B" data-colour="B" data-z="0.8-2.0" d="M 588.000 492.000 L 588.000 456.000 L 564.000 300.000 L 516.000 180.000 L 420.000 180.000 L 372.000 348.000 L 348.000 348.000 L 300.000 180.000 L 204.000 204.000 L 156.000 564.000 L 552.000 588.000 Z M 228.000 516.000 L 324.000 516.000 L 324.000 420.000 L 228.000 420.000 Z" fill="#f3c9a4" fill-opacity="0.75" fill-rule="evenodd" stroke="#b3652a" stroke-width="1.4"/>
+<path data-region="C" data-colour="C" data-z="0.8-2.0" d="M 228.000 516.000 L 324.000 516.000 L 324.000 420.000 L 228.000 420.000 Z" fill="#9fd3c7" fill-opacity="0.75" fill-rule="evenodd" stroke="#2f7d6c" stroke-width="1.4"/>
+<g class="shared-edges">
+<line class="shared-edge" data-regions="B,C" x1="228.000" y1="516.000" x2="324.000" y2="516.000"/>
+<line class="shared-edge" data-regions="B,C" x1="228.000" y1="516.000" x2="228.000" y2="420.000"/>
+<line class="shared-edge" data-regions="B,C" x1="324.000" y1="516.000" x2="324.000" y2="420.000"/>
+<line class="shared-edge" data-regions="B,C" x1="324.000" y1="420.000" x2="228.000" y2="420.000"/>
+</g>
+<g class="vertices">
+<circle class="vertex" cx="60.000" cy="660.000" r="2"/>
+<circle class="vertex" cx="660.000" cy="660.000" r="2"/>
+<circle class="vertex" cx="660.000" cy="60.000" r="2"/>
+<circle class="vertex" cx="60.000" cy="60.000" r="2"/>
+<circle class="vertex" cx="588.000" cy="492.000" r="2"/>
+<circle class="vertex" cx="588.000" cy="456.000" r="2"/>
+<circle class="vertex" cx="564.000" cy="300.000" r="2"/>
+<circle class="vertex" cx="516.000" cy="180.000" r="2"/>
+<circle class="vertex" cx="420.000" cy="180.000" r="2"/>
+<circle class="vertex" cx="372.000" cy="348.000" r="2"/>
+<circle class="vertex" cx="348.000" cy="348.000" r="2"/>
+<circle class="vertex" cx="300.000" cy="180.000" r="2"/>
+<circle class="vertex" cx="204.000" cy="204.000" r="2"/>
+<circle class="vertex" cx="156.000" cy="564.000" r="2"/>
+<circle class="vertex" cx="552.000" cy="588.000" r="2"/>
+<circle class="vertex" cx="228.000" cy="516.000" r="2"/>
+<circle class="vertex" cx="324.000" cy="516.000" r="2"/>
+<circle class="vertex" cx="324.000" cy="420.000" r="2"/>
+<circle class="vertex" cx="228.000" cy="420.000" r="2"/>
+<circle class="reflex" cx="372.000" cy="348.000" r="6"/>
+<circle class="reflex" cx="348.000" cy="348.000" r="6"/>
+</g>
+<g class="legend" transform="translate(8,712.000)">
+<text y="-52">Spike Glyph debug render &#8212; grid 10 mm, heavy lines 50 mm</text>
+<text y="-38">&#9632; A (colour A, Z 0.0–0.8 mm)</text>
+<text y="-24">&#9632; B (colour B, Z 0.8–2.0 mm)</text>
+<text y="-10">&#9632; C (colour C, Z 0.8–2.0 mm)</text>
+<text y="4" fill="#d81b60">&#9632; shared edges / reflex vertices</text>
+</g>
+</svg>
