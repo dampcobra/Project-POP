@@ -39,6 +39,7 @@ Exit code is 0 only if every pass criterion in Issue #1 holds.
 
 ### Documentation
 
+- [`docs/adr/`](docs/adr) — architecture decision records
 - [`docs/spike-01/geometry-spec.md`](docs/spike-01/geometry-spec.md) — exact mm coordinates
 - [`docs/spike-01/conclusion.md`](docs/spike-01/conclusion.md) — verdict, architectural implications, stated limitations
 - [`docs/diary/`](docs/diary) — development diary
