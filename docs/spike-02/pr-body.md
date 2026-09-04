@@ -1,7 +1,11 @@
 Implements the software portion of #3.
 
-**Do not merge** — slicer and physical validation are outstanding while Andy's
-printer is occupied.
+**Do not merge** — the depth question is still open. Round 1 is physically
+validated; round 2 artefacts are ready to print.
+
+**Round 1 physical result: concept PASS.** Pieces guide into position without
+locking, and the three-level stack assembles. `D = 0.20 mm` too shallow,
+`0.40 mm` better, still wanting more — which is what round 2 answers.
 
 ## What this is
 
@@ -14,7 +18,7 @@ white backing  ->  red enclosing colour  ->  yellow enclosed island
        0.8              1.6                        2.4 mm
 ```
 
-All software criteria pass; **137 tests green**, including Spike 01's 55
+All software criteria pass; **163 tests green**, including Spike 01's 55
 unchanged.
 
 | Criterion | Result |
@@ -150,3 +154,85 @@ per cell ready to fill in.
 Full notes: `docs/spike-02/notes.md`. Architecture:
 `docs/adr/0002-layered-relief-registration-recesses.md`. Session notes:
 `docs/diary/2026-09-04-session-0-spike-02.md`.
+
+
+---
+
+# Round 2 — depth-only follow-up
+
+Added to this PR rather than opened as a new spike. Full write-up:
+`docs/spike-02/round-2-depth-sweep.md`.
+
+## Why 0.20 mm failed, mechanically
+
+At a 0.20 mm layer height a 0.20 mm recess engages **exactly one layer — the
+first one**, which carries squish, elephant-foot compensation and bed-levelling
+error. No well-formed material does any registering at all. Each step below adds
+one clean layer.
+
+| D (mm) | Child thickness | Layers engaged | Clean layers | Support floor | Dimples |
+|---|---|---|---|---|---|
+| 0.40 | 1.20 | 2 | 1 | 1.20 | 1 |
+| 0.60 | 1.40 | 3 | 2 | 1.00 | 2 |
+| 0.80 | 1.60 | 4 | 3 | 0.80 | 3 |
+| 1.00 | 1.80 | 5 | 4 | 0.60 | 4 |
+
+Seated tops all finish at **2.40 mm** — flush, invariant in depth.
+
+## What changed, and why it had to
+
+**Backing 0.8 → 1.6 mm.** A 0.8 mm backing cannot host a 0.8 mm recess: the floor
+vanishes and the pipeline correctly refuses it as a through-hole. Verified
+against the code before proposing the change. The backing is structural and
+conceptually independent of the visible artwork colours, so thickening the
+*fixture* applies existing architecture rather than altering the Z model. `H` is
+unchanged. The middle body needs no change — its thickness is `H + D`, so its
+floor stays 0.80 mm at every depth.
+
+**Sweep extended to 1.00 mm** so it brackets the answer rather than ending where
+Andy still wants more.
+
+**Clearance held at 0.05 mm as a fixed condition**, not carried forward as a
+chosen optimum: round 1's six matrix children are the same nominal square, yet
+nominally identical prints felt different, so process variation is at least as
+large as the ladder step.
+
+**Three identical children per depth**, so print variation shows as spread within
+a depth instead of masquerading as a difference between depths.
+
+**Children carry engraved dimples**, count encoding depth — engraved rather than
+raised so they cannot interfere with the flushness check.
+
+## A latent bug this round exposed in Spike 01 code
+
+Building the `D.80` label failed: a seven-segment `8` has **two holes whose side
+edges are collinear**, and earcut merges their boundary segments. Round 1 never
+hit it because its labels only use `0`, `1`, `2` and `5`.
+
+Same class as the round-1 finding, but in `extrude` — the older path, which had no
+closure guard. `extrude` now **verifies its own output is closed**, with a
+regression test using the exact failing geometry. Spike 01's own artwork is
+unaffected (one hole) and its 55 tests pass unchanged, but the bug was real and
+**latent since Spike 01**: any artwork with two similarly arranged holes would
+have produced a quietly open mesh.
+
+## Round 2 artefacts
+
+`artefacts/spike02/depth-followup/` — fixture, 12 children, co-registered
+assembly, plate layout (230 × 51 mm), debug SVG, validation report, parameters
+JSON, and `depth-followup-report.md` as the observation sheet.
+
+## Round 2 outstanding — Andy
+
+- [ ] Print at **0.20 mm layers with 0.15 mm elephant-foot compensation** — same
+      as round 1, or comparability is lost.
+- [ ] Test all three replicates per depth.
+- [ ] Record against the acceptance target: **positive registration during normal
+      glue-up handling**, not dry retention and not a friction fit.
+
+## Round 2 limitations
+
+- Recess variation is **not** replicated — one recess per depth; only child
+  variation is captured.
+- Clearance is held, not measured; this round says nothing new about it.
+- S1/S2 not re-run, by decision.

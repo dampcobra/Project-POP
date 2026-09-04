@@ -10,7 +10,7 @@ Andy's observation sheet is generated as `artefacts/spike02/spike02-report.md`.
 ## Running it
 
 ```bash
-.venv/Scripts/python.exe -m pytest                    # 137 tests
+.venv/Scripts/python.exe -m pytest                    # 163 tests
 .venv/Scripts/python.exe -m layercake_spike.spike02   # writes artefacts/spike02/
 ```
 
