@@ -62,10 +62,16 @@ class Pocket(NamedTuple):
 
 
 class Boss(NamedTuple):
-    """Material raised `height` mm above the body's top surface."""
+    """Material raised `height` mm above the body's top surface.
+
+    `holes` are voids through the raised material, needed for lettering: a
+    seven-segment "0" encloses a rectangular void, and filling it in would make
+    the glyph unreadable. A hole's floor is the body's own top surface.
+    """
 
     ring: Ring
     height: float
+    holes: tuple[Ring, ...] = ()
 
 
 def _prepare(ring: Ring, *, ccw: bool) -> Ring:
@@ -100,6 +106,10 @@ def _validate_features(
     for b in bosses:
         if b.height <= 0:
             raise ValueError(f"boss height must be positive, got {b.height}")
+        for h in b.holes:
+            outside = clipper.boolean_op([h], [b.ring], "difference")
+            if abs(clipper.total_area(outside)) > _AREA_EPS:
+                raise ValueError("boss hole is not fully contained inside its boss")
 
     features = [("pocket", p.ring) for p in pockets] + [("boss", b.ring) for b in bosses]
 
@@ -134,7 +144,14 @@ def extrude_stepped(
 
     footprint = _prepare(footprint, ccw=True)
     pockets = [Pocket(_prepare(p.ring, ccw=True), p.depth) for p in pockets]
-    bosses = [Boss(_prepare(b.ring, ccw=True), b.height) for b in bosses]
+    bosses = [
+        Boss(
+            _prepare(b.ring, ccw=True),
+            b.height,
+            tuple(_prepare(h, ccw=True) for h in b.holes),
+        )
+        for b in bosses
+    ]
 
     _validate_features(footprint, thickness, pockets, bosses)
 
@@ -194,8 +211,14 @@ def extrude_stepped(
 
     for b in bosses:
         top = thickness + b.height
-        emit_cap(b.ring, [], top, up=True)
+        # cap of the raised material, voids removed
+        emit_cap(b.ring, list(b.holes), top, up=True)
         emit_wall(b.ring, thickness, top, outward=True)
+        for hole in b.holes:
+            # the void's floor is the body's own top surface, and its wall faces
+            # into the void
+            emit_cap(hole, [], thickness, up=True)
+            emit_wall(hole, thickness, top, outward=False)
 
     return np.asarray(vertices, dtype=np.float64), np.asarray(faces, dtype=np.int64)
 

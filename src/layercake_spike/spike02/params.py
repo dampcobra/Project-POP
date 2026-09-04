@@ -127,7 +127,7 @@ def _build_cells() -> tuple[Cell, ...]:
                     label=_label(clearance, depth),
                 )
             )
-    for shape_key, tag in (("concave", "CV"), ("radiused", "RD")):
+    for shape_key, tag in (("concave", "S1"), ("radiused", "S2")):
         cells.append(
             Cell(
                 cell_id=f"s_{shape_key}",

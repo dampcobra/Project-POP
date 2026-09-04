@@ -121,3 +121,20 @@ def test_input_winding_is_normalised_so_callers_need_not_care():
     )
     assert math.isclose(a.volume, b.volume, rel_tol=1e-12)
     assert_sound(b, "reversed")
+
+
+def test_boss_with_a_hole_keeps_the_void_and_stays_manifold():
+    """A seven-segment '0' encloses a void; filling it would break the glyph."""
+    ring = [(2.0, 2.0), (8.0, 2.0), (8.0, 10.0), (2.0, 10.0)]  # 48 mm2
+    hole = [(3.5, 3.5), (6.5, 3.5), (6.5, 8.5), (3.5, 8.5)]  # 15 mm2
+    m = mesh_of(SQ20, 1.6, (), [solids.Boss(ring, 0.6, (hole,))])
+    assert_sound(m, "boss-with-hole")
+    expected = 400.0 * 1.6 + (48.0 - 15.0) * 0.6
+    assert math.isclose(m.volume, expected, rel_tol=1e-9)
+
+
+def test_boss_hole_must_lie_inside_its_boss():
+    ring = [(2.0, 2.0), (8.0, 2.0), (8.0, 10.0), (2.0, 10.0)]
+    stray = [(12.0, 2.0), (14.0, 2.0), (14.0, 4.0), (12.0, 4.0)]
+    with pytest.raises(ValueError, match="inside its boss"):
+        solids.extrude_stepped(SQ20, 1.6, (), [solids.Boss(ring, 0.6, (stray,))])
