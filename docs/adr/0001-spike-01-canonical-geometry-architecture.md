@@ -243,22 +243,39 @@ what the canonical model holds.
 This reframes an island from a structural part to a located inlay, moving the
 mechanical job from press fit to adhesive.
 
+#### What the construction sketch settles
+
+From [`recess-concept.jpg`](../spike-01/recess-concept.jpg), a cross-section
+through the badge:
+
+- Backing continuous and full width; the main colour body sits on it, also full
+  width. **No through-hole.**
+- The recess is a shallow pocket in the *top* of the main colour body, so its
+  floor is main-body material. The island rests on **that body, not on the
+  backing** — a change from the spike, where the island sat directly on the
+  backing.
+- **The island stands proud of the surrounding colour**, not flush: only its
+  lower portion seats in the pocket. Island thickness therefore exceeds recess
+  depth, and the artwork gains visible relief at island boundaries.
+
 #### Open geometry questions before implementation
 
-- **Recess depth versus island thickness.** A shallow recess has a floor of
-  surrounding-body material, so the island would rest on **that body rather than
-  on the backing** — a change from the spike, where the island sat directly on
-  the backing. Does the island then become thinner than the artwork band, sized
-  to recess depth so its top finishes flush?
-- **Which surface is the datum?** A flush top surface and seating on the recess
-  floor are only simultaneously satisfiable if island thickness and recess depth
-  are derived from one another.
+- **Recess depth as an independent parameter.** No longer derived from island
+  thickness, so it needs its own rule — deep enough to locate reliably, shallow
+  enough to leave a sound floor.
 - **Where is clearance applied?** Growing the recess, shrinking the island, or
   splitting the allowance are three different strategies with different visible
   gap widths on the finished piece.
 - **Does the recess floor need its own minimum-thickness rule?** It becomes a
   thin horizontal web subject to the same manufacturability limits as any other
-  feature.
+  feature — and unlike a vertical wall it is a printed floor spanning a cavity.
+- **What bonds to what?** Point 6 says pieces are glued to the backing, but
+  geometrically the island bonds to the recess floor, which is main-body
+  material. Worth confirming that is intended.
+- **Does a raised island change the colour model?** Standing proud means the
+  artwork is no longer strictly flat mosaic within one band. Still
+  fixed-height-per-region rather than variable relief, but the "single artwork
+  band" assumption in the current geometry spec would need revisiting.
 
 #### Minimum-feature policy — still provisional
 
@@ -337,7 +354,8 @@ rejected on physical evidence, and the registration-recess direction that
 replaces it is recorded as intent to investigate, not as an accepted design.
 The minimum-feature policy within decision 8 remains provisional and untested.
 
-Photographic evidence — the printed badge with the loose island, and the
-construction sketch — is held by Andy and is not currently committed to the
-repository. The physical-validation write-up in this ADR and in the spike
-conclusion is from Andy's description of those photographs.
+Photographic evidence is committed alongside the spike documentation:
+[`physical-print.jpg`](../spike-01/physical-print.jpg) (the printed badge with
+the island sitting proud in its opening) and
+[`recess-concept.jpg`](../spike-01/recess-concept.jpg) (Andy's cross-section
+sketch of the proposed construction).

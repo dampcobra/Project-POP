@@ -154,18 +154,20 @@ There is **no `clipper2` package on PyPI**. `pyclipper` is Clipper *1*. This use
 - [x] Physical print and observations — printed cleanly; island would not fit its
       zero-clearance opening.
 
-Photographs are held by Andy and are not committed to this repository; the
-physical-validation write-up is from Andy's description of them.
+Photographs committed as evidence: `docs/spike-01/physical-print.jpg` (printed
+badge, island sitting proud in its opening) and `docs/spike-01/recess-concept.jpg`
+(cross-section sketch of the proposed construction).
 
 ## Open questions for Andy / Elara
 
 1. **Clearance value and strategy** — how much, and applied where (grow the
    recess, shrink the island, or split the allowance)? Now live rather than
    hypothetical.
-2. **Recess geometry** — depth vs island thickness, which surface is the datum,
-   and whether the recess floor needs its own minimum-thickness rule. Note a
-   shallow recess means the island rests on the surrounding body, not the
-   backing — a change from this spike.
+2. **Recess geometry** — recess depth as an independent parameter, and whether
+   the recess floor needs its own minimum-thickness rule. Note the sketch shows
+   the island resting on the surrounding body rather than the backing, and
+   **standing proud rather than flush** — which puts the current single-flat-band
+   assumption up for revision.
 3. **Minimum-feature policy** — the print did not test the 0.4 mm threshold. Is
    silent removal right, or should the user get a choice?
 4. Add an independent mesh validator to cross-check self-intersection results?

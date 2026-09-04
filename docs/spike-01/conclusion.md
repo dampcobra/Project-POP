@@ -70,10 +70,12 @@ decision 6 already held that clearance belongs in export as derived fabrication
 geometry and never in the canonical model. What changed is that clearance moved
 from *hypothetical* to *required*, with a measured reason.
 
-**Evidence:** photographs held by Andy — the printed badge with the loose island
-resting on top, and a sketch of the proposed construction model. This write-up is
-from Andy's description of those photographs; they are not currently committed to
-the repository.
+### Evidence
+
+| File | What it shows |
+|---|---|
+| [`physical-print.jpg`](physical-print.jpg) | The printed badge. White backing, red foreground with the V-notch and a clean edge where the tab was removed, and the yellow island sitting proud in its opening rather than seated. |
+| [`recess-concept.jpg`](recess-concept.jpg) | Andy's cross-section sketch of the proposed construction: continuous white backing, red artwork above it, yellow island located in a shallow recess and standing proud of the red. |
 
 ---
 
@@ -214,21 +216,39 @@ implemented in this spike):**
 This reframes the island from a structural part to a located inlay, and moves the
 mechanical job from press fit to adhesive.
 
-**Open geometry questions this raises**, worth settling before implementation:
+**What the construction sketch settles** (`recess-concept.jpg`, a cross-section
+through the badge):
 
-- **Recess depth versus island thickness.** If the recess is shallow, its floor
-  is B material, so the island rests on **B rather than on the backing** — a
-  change from the spike, where C sat directly on A. Is the island then thinner
-  than the artwork band, sized to the recess depth so its top finishes flush?
-- **Which surface is the datum?** Flush top surface and seating on the recess
-  floor are only simultaneously satisfiable if island thickness and recess depth
-  are derived from one another.
+- The backing is continuous and full width. The main colour body sits on it,
+  also full width — **no through-hole**.
+- The recess is a shallow pocket in the *top* of the main colour body, so its
+  floor is main-body material. The island therefore rests on **B, not on the
+  backing** — a change from the spike, where C sat directly on A.
+- **The island stands proud of the surrounding colour.** It is not flush: the
+  sketch shows the island's top surface above the main body's top surface, with
+  only its lower portion seated in the pocket. Island thickness is therefore
+  *greater* than recess depth, and the artwork gains visible relief at island
+  boundaries.
+
+**Open geometry questions still to settle before implementation:**
+
+- **Recess depth as a parameter.** Depth is now independent of island thickness
+  rather than derived from it, so it needs its own rule — deep enough to locate
+  the piece reliably, shallow enough to leave a sound floor.
 - **Where clearance is applied.** Growing the recess, shrinking the island, or
   splitting the allowance between them are three different fabrication
-  strategies with different visible gap sizes on the finished piece.
-- **Does the recess floor need its own minimum thickness rule?** It is now a
+  strategies with different visible gap widths on the finished piece.
+- **Does the recess floor need its own minimum-thickness rule?** It becomes a
   thin horizontal web of B, subject to the same manufacturability limits as any
-  other feature.
+  other feature — and unlike a vertical wall, it is a printed floor spanning a
+  cavity.
+- **What bonds to what.** Andy's model says pieces are glued to the backing, but
+  geometrically the island bonds to the *recess floor*, which is main-body
+  material. Worth confirming that is intended.
+- **Does the raised island change the colour model?** Standing proud means the
+  artwork is no longer strictly flat mosaic within a single band. This is still
+  fixed-height-per-region, not variable relief, but the "one artwork band"
+  assumption in the current spec would need revisiting.
 
 ### 6. Exact coincidence is canonical; clearance is derived — CONFIRMED by physical testing
 
