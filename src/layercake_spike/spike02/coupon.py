@@ -202,6 +202,17 @@ def inspect_derived_support(
     thins any support tongue protruding into a concavity of the child by twice
     the clearance, and an unprintable tongue would otherwise reach the plate
     unnoticed. So this measures and reports; it never mutates.
+
+    Findings are classified, because morphological opening detects two different
+    things and only one of them is a defect. Opening cannot reproduce an internal
+    corner tighter than its own probe radius, so every concave corner of the
+    support registers as a sliver -- and the recess corners are radiused by the
+    clearance (0.05-0.20 mm), all tighter than the 0.2 mm probe. Those are
+    `corner_artifact`: a nozzle simply rounds them slightly and nothing is lost.
+    A genuine `thin_derived_support` is long and narrow, so it is distinguished
+    by extending further than the minimum feature width in at least one
+    direction. Reporting them undifferentiated would bury a real defect among
+    dozens of harmless ones.
     """
     support = clipper.boolean_op([footprint], [p.ring for p in pockets], "difference")
     if not support:
@@ -213,13 +224,23 @@ def inspect_derived_support(
         if area <= 1e-3:
             continue
         x0, y0, x1, y1 = _bounds(sliver)
+        w, h = x1 - x0, y1 - y0
+        corner = max(w, h) < params.MIN_SUPPORT_FEATURE_MM
         findings.append(
             cleanup.Finding(
                 region="coupon_fixture_support",
-                kind="thin_derived_support",
+                kind="corner_artifact" if corner else "thin_derived_support",
                 detail=(
-                    f"derived support thinner than {params.MIN_SUPPORT_FEATURE_MM} mm "
-                    f"at x {x0:.3f}..{x1:.3f}, y {y0:.3f}..{y1:.3f}"
+                    (
+                        "internal corner tighter than the "
+                        f"{params.MIN_SUPPORT_FEATURE_MM / 2} mm opening probe "
+                        "(recess corners are radiused by the clearance); the "
+                        "nozzle rounds this and nothing is lost"
+                        if corner
+                        else "derived support thinner than "
+                        f"{params.MIN_SUPPORT_FEATURE_MM} mm over a run"
+                    )
+                    + f" at x {x0:.3f}..{x1:.3f}, y {y0:.3f}..{y1:.3f}"
                 ),
                 area_mm2=area,
                 min_feature_mm=params.MIN_SUPPORT_FEATURE_MM,

@@ -1,0 +1,1047 @@
+{
+  "spike": "02 - shallow registration recesses for layered-relief assembly",
+  "issue": "dampcobra/Project-POP#3",
+  "units": "mm",
+  "construction": "layered relief: white backing -> red enclosing colour -> yellow island",
+  "process_conditions": {
+    "slicer_layer_height_mm": 0.2,
+    "elephant_foot_compensation": "TO BE RECORDED BY ANDY AT PRINT TIME",
+    "nozzle_assumption_mm": 0.4
+  },
+  "model": {
+    "visible_step_height_mm": 0.8,
+    "child_thickness_rule": "H + D",
+    "clearance_definition": "per-side (radial), recess dilated outward from the canonical child footprint; the child is never shrunk",
+    "join_type": "round",
+    "fixture_support_thickness_mm": 1.6,
+    "stack_backing_thickness_mm": 0.8
+  },
+  "criteria": {
+    "clearance_present_numerically": true,
+    "recess_depth_correct": true,
+    "support_continuous": true,
+    "child_thickness_is_h_plus_d": true,
+    "three_level_z_arithmetic": true,
+    "island_seated_not_stacked": true,
+    "meshes_manifold": true
+  },
+  "pass": true,
+  "cells": [
+    {
+      "cell_id": "m_c005_d020",
+      "kind": "matrix",
+      "label": "C.05 D.20",
+      "shape": "simple",
+      "nominal_clearance_mm": 0.05,
+      "achieved_clearance_mm": 0.049899778618038605,
+      "recess_depth_mm": 0.2,
+      "child_thickness_mm": 1.0,
+      "origin_mm": [
+        7.0,
+        7.0
+      ],
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 1.4000000000000001,
+        "child_bottom": 1.4000000000000001,
+        "child_top": 2.4000000000000004,
+        "child_thickness": 1.0,
+        "depth": 0.2,
+        "visible_step": 0.8
+      },
+      "support_floor_mm": 1.4000000000000001,
+      "support_floor_ok": true,
+      "visible_support_outline": {
+        "width_mm": 0.049899778618038605,
+        "area_mm2": 2.407833634083943
+      },
+      "registration_freedom_per_side_mm": 0.05
+    },
+    {
+      "cell_id": "m_c010_d020",
+      "kind": "matrix",
+      "label": "C.10 D.20",
+      "shape": "simple",
+      "nominal_clearance_mm": 0.1,
+      "achieved_clearance_mm": 0.09979967265638422,
+      "recess_depth_mm": 0.2,
+      "child_thickness_mm": 1.0,
+      "origin_mm": [
+        43.0,
+        7.0
+      ],
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 1.4000000000000001,
+        "child_bottom": 1.4000000000000001,
+        "child_top": 2.4000000000000004,
+        "child_thickness": 1.0,
+        "depth": 0.2,
+        "visible_step": 0.8
+      },
+      "support_floor_mm": 1.4000000000000001,
+      "support_floor_ok": true,
+      "visible_support_outline": {
+        "width_mm": 0.09979967265638422,
+        "area_mm2": 4.831334548533874
+      },
+      "registration_freedom_per_side_mm": 0.1
+    },
+    {
+      "cell_id": "m_c020_d020",
+      "kind": "matrix",
+      "label": "C.20 D.20",
+      "shape": "simple",
+      "nominal_clearance_mm": 0.2,
+      "achieved_clearance_mm": 0.19959965722635994,
+      "recess_depth_mm": 0.2,
+      "child_thickness_mm": 1.0,
+      "origin_mm": [
+        79.0,
+        7.0
+      ],
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 1.4000000000000001,
+        "child_bottom": 1.4000000000000001,
+        "child_top": 2.4000000000000004,
+        "child_thickness": 1.0,
+        "depth": 0.2,
+        "visible_step": 0.8
+      },
+      "support_floor_mm": 1.4000000000000001,
+      "support_floor_ok": true,
+      "visible_support_outline": {
+        "width_mm": 0.19959965722635994,
+        "area_mm2": 9.725337988688295
+      },
+      "registration_freedom_per_side_mm": 0.2
+    },
+    {
+      "cell_id": "m_c005_d040",
+      "kind": "matrix",
+      "label": "C.05 D.40",
+      "shape": "simple",
+      "nominal_clearance_mm": 0.05,
+      "achieved_clearance_mm": 0.049899778618034275,
+      "recess_depth_mm": 0.4,
+      "child_thickness_mm": 1.2000000000000002,
+      "origin_mm": [
+        115.0,
+        7.0
+      ],
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 1.2000000000000002,
+        "child_bottom": 1.2000000000000002,
+        "child_top": 2.4000000000000004,
+        "child_thickness": 1.2000000000000002,
+        "depth": 0.4,
+        "visible_step": 0.8
+      },
+      "support_floor_mm": 1.2000000000000002,
+      "support_floor_ok": true,
+      "visible_support_outline": {
+        "width_mm": 0.049899778618034275,
+        "area_mm2": 2.4078336340836017
+      },
+      "registration_freedom_per_side_mm": 0.05
+    },
+    {
+      "cell_id": "m_c010_d040",
+      "kind": "matrix",
+      "label": "C.10 D.40",
+      "shape": "simple",
+      "nominal_clearance_mm": 0.1,
+      "achieved_clearance_mm": 0.09979967265638422,
+      "recess_depth_mm": 0.4,
+      "child_thickness_mm": 1.2000000000000002,
+      "origin_mm": [
+        7.0,
+        35.0
+      ],
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 1.2000000000000002,
+        "child_bottom": 1.2000000000000002,
+        "child_top": 2.4000000000000004,
+        "child_thickness": 1.2000000000000002,
+        "depth": 0.4,
+        "visible_step": 0.8
+      },
+      "support_floor_mm": 1.2000000000000002,
+      "support_floor_ok": true,
+      "visible_support_outline": {
+        "width_mm": 0.09979967265638422,
+        "area_mm2": 4.831334548534073
+      },
+      "registration_freedom_per_side_mm": 0.1
+    },
+    {
+      "cell_id": "m_c020_d040",
+      "kind": "matrix",
+      "label": "C.20 D.40",
+      "shape": "simple",
+      "nominal_clearance_mm": 0.2,
+      "achieved_clearance_mm": 0.19959965722636544,
+      "recess_depth_mm": 0.4,
+      "child_thickness_mm": 1.2000000000000002,
+      "origin_mm": [
+        43.0,
+        35.0
+      ],
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 1.2000000000000002,
+        "child_bottom": 1.2000000000000002,
+        "child_top": 2.4000000000000004,
+        "child_thickness": 1.2000000000000002,
+        "depth": 0.4,
+        "visible_step": 0.8
+      },
+      "support_floor_mm": 1.2000000000000002,
+      "support_floor_ok": true,
+      "visible_support_outline": {
+        "width_mm": 0.19959965722636544,
+        "area_mm2": 9.725337988688011
+      },
+      "registration_freedom_per_side_mm": 0.2
+    },
+    {
+      "cell_id": "s_concave",
+      "kind": "shape_control",
+      "label": "S1 C.10 D.20",
+      "shape": "concave",
+      "nominal_clearance_mm": 0.1,
+      "achieved_clearance_mm": 0.09979967265638422,
+      "recess_depth_mm": 0.2,
+      "child_thickness_mm": 1.0,
+      "origin_mm": [
+        79.0,
+        35.0
+      ],
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 1.4000000000000001,
+        "child_bottom": 1.4000000000000001,
+        "child_top": 2.4000000000000004,
+        "child_thickness": 1.0,
+        "depth": 0.2,
+        "visible_step": 0.8
+      },
+      "support_floor_mm": 1.4000000000000001,
+      "support_floor_ok": true,
+      "visible_support_outline": {
+        "width_mm": 0.09979967265638422,
+        "area_mm2": 6.62700182279923
+      },
+      "registration_freedom_per_side_mm": 0.1
+    },
+    {
+      "cell_id": "s_radiused",
+      "kind": "shape_control",
+      "label": "S2 C.10 D.20",
+      "shape": "radiused",
+      "nominal_clearance_mm": 0.1,
+      "achieved_clearance_mm": 0.09979983076976283,
+      "recess_depth_mm": 0.2,
+      "child_thickness_mm": 1.0,
+      "origin_mm": [
+        115.0,
+        35.0
+      ],
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 1.4000000000000001,
+        "child_bottom": 1.4000000000000001,
+        "child_top": 2.4000000000000004,
+        "child_thickness": 1.0,
+        "depth": 0.2,
+        "visible_step": 0.8
+      },
+      "support_floor_mm": 1.4000000000000001,
+      "support_floor_ok": true,
+      "visible_support_outline": {
+        "width_mm": 0.09979983076976283,
+        "area_mm2": 4.487161542083641
+      },
+      "registration_freedom_per_side_mm": 0.1
+    }
+  ],
+  "three_level_stack": {
+    "depth_0.20": {
+      "clearance_mm": 0.1,
+      "depth_mm": 0.2,
+      "completed_tops_mm": [
+        0.8,
+        1.6,
+        2.4
+      ],
+      "cumulative_registration_freedom_mm": 0.2,
+      "levels": [
+        {
+          "name": "white",
+          "colour": "A",
+          "canonical_hole_count": 0,
+          "fabrication_hole_count": 0,
+          "z": {
+            "support_top": 0.0,
+            "recess_floor": 0.0,
+            "child_bottom": 0.0,
+            "child_top": 0.8,
+            "child_thickness": 0.8,
+            "depth": 0.0,
+            "visible_step": 0.8
+          },
+          "hosts_recess_for": "red",
+          "support_floor_mm": 0.6000000000000001,
+          "visible_support_outline": {
+            "width_mm": 0.09979968279628097,
+            "area_mm2": 14.64513992460445
+          }
+        },
+        {
+          "name": "red",
+          "colour": "B",
+          "canonical_hole_count": 1,
+          "fabrication_hole_count": 0,
+          "z": {
+            "support_top": 0.8,
+            "recess_floor": 0.6000000000000001,
+            "child_bottom": 0.6000000000000001,
+            "child_top": 1.6,
+            "child_thickness": 1.0,
+            "depth": 0.2,
+            "visible_step": 0.8
+          },
+          "hosts_recess_for": "yellow",
+          "support_floor_mm": 0.8,
+          "visible_support_outline": {
+            "width_mm": 0.0997996726563871,
+            "area_mm2": 3.2313345485340363
+          }
+        },
+        {
+          "name": "yellow",
+          "colour": "C",
+          "canonical_hole_count": 0,
+          "fabrication_hole_count": 0,
+          "z": {
+            "support_top": 1.6,
+            "recess_floor": 1.4000000000000001,
+            "child_bottom": 1.4000000000000001,
+            "child_top": 2.4000000000000004,
+            "child_thickness": 1.0,
+            "depth": 0.2,
+            "visible_step": 0.8
+          },
+          "hosts_recess_for": null,
+          "support_floor_mm": null,
+          "visible_support_outline": null
+        }
+      ]
+    },
+    "depth_0.40": {
+      "clearance_mm": 0.1,
+      "depth_mm": 0.4,
+      "completed_tops_mm": [
+        0.8,
+        1.6,
+        2.4
+      ],
+      "cumulative_registration_freedom_mm": 0.2,
+      "levels": [
+        {
+          "name": "white",
+          "colour": "A",
+          "canonical_hole_count": 0,
+          "fabrication_hole_count": 0,
+          "z": {
+            "support_top": 0.0,
+            "recess_floor": 0.0,
+            "child_bottom": 0.0,
+            "child_top": 0.8,
+            "child_thickness": 0.8,
+            "depth": 0.0,
+            "visible_step": 0.8
+          },
+          "hosts_recess_for": "red",
+          "support_floor_mm": 0.4,
+          "visible_support_outline": {
+            "width_mm": 0.09979968279628097,
+            "area_mm2": 14.64513992460445
+          }
+        },
+        {
+          "name": "red",
+          "colour": "B",
+          "canonical_hole_count": 1,
+          "fabrication_hole_count": 0,
+          "z": {
+            "support_top": 0.8,
+            "recess_floor": 0.4,
+            "child_bottom": 0.4,
+            "child_top": 1.6,
+            "child_thickness": 1.2000000000000002,
+            "depth": 0.4,
+            "visible_step": 0.8
+          },
+          "hosts_recess_for": "yellow",
+          "support_floor_mm": 0.8000000000000002,
+          "visible_support_outline": {
+            "width_mm": 0.0997996726563871,
+            "area_mm2": 3.2313345485340363
+          }
+        },
+        {
+          "name": "yellow",
+          "colour": "C",
+          "canonical_hole_count": 0,
+          "fabrication_hole_count": 0,
+          "z": {
+            "support_top": 1.6,
+            "recess_floor": 1.2000000000000002,
+            "child_bottom": 1.2000000000000002,
+            "child_top": 2.4000000000000004,
+            "child_thickness": 1.2000000000000002,
+            "depth": 0.4,
+            "visible_step": 0.8
+          },
+          "hosts_recess_for": null,
+          "support_floor_mm": null,
+          "visible_support_outline": null
+        }
+      ]
+    }
+  },
+  "derived_geometry_inspection": {
+    "mode": "report_only",
+    "min_feature_mm": 0.4,
+    "note": "Spike 01's minimum-feature cleanup applies to canonical geometry only. Running it over derived geometry would erase the clearances under test, so derived geometry is measured and reported, never mutated.",
+    "classification_note": "Morphological opening detects two things: genuinely thin support, and internal corners tighter than its probe radius. Recess corners are radiused by the clearance, all tighter than the probe, so they register as corner_artifact -- a nozzle rounds them and nothing is lost. Only thin_derived_support is a defect.",
+    "thin_support_count": 0,
+    "corner_artifact_count": 23,
+    "findings": [
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 93.000..93.100, y 49.000..49.100",
+        "area_mm2": 0.002166362866773852,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 87.900..88.000, y 49.000..49.100",
+        "area_mm2": 0.0021663628672285995,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 42.801..42.975, y 47.013..47.198",
+        "area_mm2": 0.005515954976885951,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 55.036..55.198, y 47.025..47.197",
+        "area_mm2": 0.0055106538193285814,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 19.000..19.100, y 47.000..47.100",
+        "area_mm2": 0.002166362866603322,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 6.900..7.000, y 47.000..47.100",
+        "area_mm2": 0.0021663628665180568,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 84.000..84.100, y 46.000..46.100",
+        "area_mm2": 0.002166362867001226,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 78.900..79.000, y 46.000..46.100",
+        "area_mm2": 0.002166362866773852,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 125.088..125.100, y 43.000..43.197",
+        "area_mm2": 0.0011882011190209596,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 42.800..42.983, y 34.801..34.996",
+        "area_mm2": 0.005518313372704142,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 6.900..7.000, y 34.900..35.000",
+        "area_mm2": 0.0021663628665180568,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 19.000..19.100, y 34.900..35.000",
+        "area_mm2": 0.002166362866375948,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 78.900..79.000, y 34.900..35.000",
+        "area_mm2": 0.0021663628665464785,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 93.000..93.100, y 34.900..35.000",
+        "area_mm2": 0.002166362866773852,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 55.004..55.197, y 34.800..34.964",
+        "area_mm2": 0.0055135805250756675,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 78.801..78.975, y 19.018..19.198",
+        "area_mm2": 0.005515970226952049,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 91.036..91.198, y 19.025..19.197",
+        "area_mm2": 0.005510653819442268,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 55.000..55.100, y 19.000..19.100",
+        "area_mm2": 0.0021663628665464785,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 42.900..43.000, y 19.000..19.100",
+        "area_mm2": 0.002166362866603322,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 42.900..43.000, y 6.900..7.000",
+        "area_mm2": 0.0021663628665180568,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 55.000..55.100, y 6.900..7.000",
+        "area_mm2": 0.002166362866489635,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 78.800..78.982, y 6.801..6.995",
+        "area_mm2": 0.0055184125395157935,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      },
+      {
+        "region": "coupon_fixture_support",
+        "kind": "corner_artifact",
+        "detail": "internal corner tighter than the 0.2 mm opening probe (recess corners are radiused by the clearance); the nozzle rounds this and nothing is lost at x 91.004..91.197, y 6.800..6.964",
+        "area_mm2": 0.005513580524961981,
+        "min_feature_mm": 0.4,
+        "action": "reported_only"
+      }
+    ]
+  },
+  "validation": {
+    "tool": "trimesh (watertight/winding/euler) + project self-intersection checker",
+    "tool_notes": [
+      "Self-intersection counts come from this project's own triangle-triangle checker, not from trimesh, which has no such test. That checker has not been cross-checked against an independent mesh validator, is O(n^2) in its broad phase, and treats touching faces as non-intersecting. Its evidential status is unchanged from Spike 01.",
+      "Recess dilation uses a round join, so clearance is radial. Clipper2 approximates each corner arc with chords, leaving the achieved clearance a sagitta short of nominal -- under 1 um at these radii, roughly 1000x finer than a 0.4 mm nozzle. Achieved values are measured and reported, not assumed."
+    ],
+    "bodies": [
+      {
+        "body": "coupon_child_m_c005_d020",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 144.0,
+        "face_count": 12,
+        "vertex_count": 8,
+        "bounds": [
+          [
+            7.0,
+            7.0,
+            0.0
+          ],
+          [
+            19.0,
+            19.0,
+            1.0
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "coupon_child_m_c005_d040",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 172.79999999999987,
+        "face_count": 12,
+        "vertex_count": 8,
+        "bounds": [
+          [
+            115.0,
+            7.0,
+            0.0
+          ],
+          [
+            127.0,
+            19.0,
+            1.2000000000000002
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "coupon_child_m_c010_d020",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 144.0,
+        "face_count": 12,
+        "vertex_count": 8,
+        "bounds": [
+          [
+            43.0,
+            7.0,
+            0.0
+          ],
+          [
+            55.0,
+            19.0,
+            1.0
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "coupon_child_m_c010_d040",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 172.79999999999998,
+        "face_count": 12,
+        "vertex_count": 8,
+        "bounds": [
+          [
+            7.0,
+            35.0,
+            0.0
+          ],
+          [
+            19.0,
+            47.0,
+            1.2000000000000002
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "coupon_child_m_c020_d020",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 144.0,
+        "face_count": 12,
+        "vertex_count": 8,
+        "bounds": [
+          [
+            79.0,
+            7.0,
+            0.0
+          ],
+          [
+            91.0,
+            19.0,
+            1.0
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "coupon_child_m_c020_d040",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 172.80000000000004,
+        "face_count": 12,
+        "vertex_count": 8,
+        "bounds": [
+          [
+            43.0,
+            35.0,
+            0.0
+          ],
+          [
+            55.0,
+            47.0,
+            1.2000000000000002
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "coupon_child_s_concave",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 149.0,
+        "face_count": 28,
+        "vertex_count": 16,
+        "bounds": [
+          [
+            79.0,
+            35.0,
+            0.0
+          ],
+          [
+            93.0,
+            49.0,
+            1.0
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "coupon_child_s_radiused",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 140.53380327929577,
+        "face_count": 220,
+        "vertex_count": 112,
+        "bounds": [
+          [
+            113.0,
+            33.0,
+            0.0
+          ],
+          [
+            125.0,
+            45.0,
+            1.0
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "coupon_fixture",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 17513.410416756207,
+        "face_count": 4704,
+        "vertex_count": 2354,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            158.0,
+            70.0,
+            2.200000047683716
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "stack_red",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 952.5537330902931,
+        "face_count": 264,
+        "vertex_count": 134,
+        "bounds": [
+          [
+            8.0,
+            6.0,
+            0.6000000000000001
+          ],
+          [
+            44.0,
+            40.0,
+            1.6
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "stack_white",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 1803.8709720150791,
+        "face_count": 356,
+        "vertex_count": 180,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            50.0,
+            50.0,
+            0.8
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "stack_yellow",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 64.00000000000003,
+        "face_count": 12,
+        "vertex_count": 8,
+        "bounds": [
+          [
+            14.0,
+            12.0,
+            1.4000000000000001
+          ],
+          [
+            22.0,
+            20.0,
+            2.4000000000000004
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      }
+    ]
+  },
+  "plate_layout": [
+    {
+      "name": "coupon_fixture",
+      "dx": 6.0,
+      "dy": 6.0,
+      "dz": -0.0
+    },
+    {
+      "name": "stack_white",
+      "dx": 170.0,
+      "dy": 6.0,
+      "dz": -0.0
+    },
+    {
+      "name": "stack_red",
+      "dx": -2.0,
+      "dy": 76.0,
+      "dz": -0.6000000000000001
+    },
+    {
+      "name": "coupon_child_s_concave",
+      "dx": -31.0,
+      "dy": 47.0,
+      "dz": -0.0
+    },
+    {
+      "name": "coupon_child_m_c005_d020",
+      "dx": 61.0,
+      "dy": 75.0,
+      "dz": -0.0
+    },
+    {
+      "name": "coupon_child_m_c010_d020",
+      "dx": 43.0,
+      "dy": 75.0,
+      "dz": -0.0
+    },
+    {
+      "name": "coupon_child_m_c020_d020",
+      "dx": 25.0,
+      "dy": 75.0,
+      "dz": -0.0
+    },
+    {
+      "name": "coupon_child_m_c005_d040",
+      "dx": 7.0,
+      "dy": 75.0,
+      "dz": -0.0
+    },
+    {
+      "name": "coupon_child_m_c010_d040",
+      "dx": 133.0,
+      "dy": 47.0,
+      "dz": -0.0
+    },
+    {
+      "name": "coupon_child_m_c020_d040",
+      "dx": 115.0,
+      "dy": 47.0,
+      "dz": -0.0
+    },
+    {
+      "name": "coupon_child_s_radiused",
+      "dx": 63.0,
+      "dy": 49.0,
+      "dz": -0.0
+    },
+    {
+      "name": "stack_yellow",
+      "dx": 180.0,
+      "dy": 70.0,
+      "dz": -1.4000000000000001
+    }
+  ],
+  "not_verified_here": [
+    "Slicer import/slice evidence -- requires Andy's Bambu P1S.",
+    "Physical fit, registration, seating, step height and recess quality.",
+    "The 0.4 mm minimum-feature threshold, which this coupon does not exercise."
+  ]
+}

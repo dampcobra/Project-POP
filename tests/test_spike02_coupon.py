@@ -120,3 +120,16 @@ def test_coupon_fits_a_p1s_bed():
         max(p[1] for p in RESULT.fixture_footprint),
     )
     assert (x1 - x0) <= 250.0 and (y1 - y0) <= 250.0
+
+
+def test_recess_corner_artefacts_are_not_reported_as_thin_support():
+    """Opening flags internal corners tighter than its probe, not just thin runs.
+
+    Recess corners are radiused by the clearance (0.05-0.20 mm), all tighter than
+    the 0.2 mm probe, so every one trips the detector. Reporting them as defects
+    would bury a real finding among dozens of harmless ones.
+    """
+    kinds = {f.kind for f in RESULT.derived_feature_findings}
+    assert kinds <= {"corner_artifact", "thin_derived_support"}
+    real = [f for f in RESULT.derived_feature_findings if f.kind == "thin_derived_support"]
+    assert real == [], [f.detail for f in real]
