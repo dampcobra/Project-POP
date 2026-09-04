@@ -269,6 +269,17 @@ def prism(
     return trimesh.Trimesh(vertices=v, faces=f, process=False)
 
 
+def text_solids(rects: Sequence[Ring], z0: float, z1: float) -> list["trimesh.Trimesh"]:
+    """One box prism per glyph segment rectangle, for union onto a body.
+
+    Deliberately does not pre-union the rectangles in 2D. Doing so yields rings
+    with holes -- and a glyph like "8" has two holes whose side edges are
+    collinear, which the ear-clipping triangulator merges, opening the surface.
+    Overlapping boxes unioned as solids sidestep the triangulator entirely.
+    """
+    return [prism(r, z0, z1) for r in rects]
+
+
 def union_all(meshes: Sequence["trimesh.Trimesh"]) -> "trimesh.Trimesh":
     """Union meshes into one guaranteed-manifold solid.
 

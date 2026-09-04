@@ -152,17 +152,19 @@ def build_coupon() -> CouponResult:
 
         _, y0, _, _ = _bounds(recess)
         label_y = y0 - LABEL_GAP_MM - params.LABEL_SIZE_MM
-        for ring, holes in font.text_rings(
-            cell.label, ox, label_y, params.LABEL_SIZE_MM, params.LABEL_STROKE_MM
-        ):
-            # Glyphs share a text baseline, so their boundaries are collinear and
-            # cannot go through the cap triangulator as bosses. They are unioned
-            # on instead -- see solids.union_all.
-            label_solids.append(
-                solids.prism(
-                    ring, thickness, thickness + params.LABEL_BOSS_MM, holes
-                )
+        # Glyphs share a text baseline, and a glyph like "8" has two holes whose
+        # side edges are collinear. Either case defeats the cap triangulator, so
+        # lettering is assembled as a union of plain segment boxes instead --
+        # see solids.text_solids.
+        label_solids.extend(
+            solids.text_solids(
+                font.text_segment_rects(
+                    cell.label, ox, label_y, params.LABEL_SIZE_MM, params.LABEL_STROKE_MM
+                ),
+                thickness,
+                thickness + params.LABEL_BOSS_MM,
             )
+        )
 
         placements.append(
             CellPlacement(cell, (ox, oy), canonical, recess, z, outline, floor)

@@ -132,3 +132,62 @@ def test_report_gives_andy_blank_observation_tables(built):
     assert "Slicer layer height" in text
     for cell in params.CELLS:
         assert cell.cell_id in text
+
+
+def test_depth_followup_artefacts_are_written(built):
+    out, _ = built
+    fu = out / "depth-followup"
+    for name in [
+        "depth_followup_fixture.stl",
+        "assembly_coregistered.stl",
+        "plate_layout.stl",
+        "debug-recesses.svg",
+        "validation-report.md",
+        "depth-followup-parameters.json",
+        "depth-followup-report.md",
+    ]:
+        assert (fu / name).exists(), name
+    children = sorted(fu.glob("depth_child_*.stl"))
+    assert len(children) == 4 * params.DEPTH_FOLLOWUP_REPLICATES
+
+
+def test_depth_followup_children_reload_watertight_with_right_thicknesses(built):
+    out, _ = built
+    fu = out / "depth-followup"
+    seen = {}
+    for path in sorted(fu.glob("depth_child_*.stl")):
+        m = trimesh.load(path)
+        assert m.is_watertight, path.name
+        h = round(float(m.bounds[1][2] - m.bounds[0][2]), 3)
+        seen.setdefault(h, 0)
+        seen[h] += 1
+    expected = {
+        round(params.H_VISIBLE_STEP_MM + d, 3): params.DEPTH_FOLLOWUP_REPLICATES
+        for d in params.DEPTH_FOLLOWUP_DEPTHS
+    }
+    assert seen == expected, seen
+
+
+def test_depth_followup_summary_holds_one_variable(built):
+    out, _ = built
+    s = json.loads(
+        (out / "depth-followup" / "depth-followup-parameters.json").read_text()
+    )
+    assert s["pass"]
+    assert all(s["criteria"].values()), s["criteria"]
+    assert len({c["clearance_mm"] for c in s["cells"]}) == 1
+    assert [c["depth_mm"] for c in s["cells"]] == [0.40, 0.60, 0.80, 1.00]
+    assert s["changed_from_round_1"]["backing_thickness_mm"] == 1.6
+    assert "glue-up handling" in s["acceptance_target"]
+
+
+def test_depth_followup_report_asks_the_right_question(built):
+    out, _ = built
+    text = (out / "depth-followup" / "depth-followup-report.md").read_text(
+        encoding="utf-8"
+    )
+    assert "Stays put during handling" in text
+    assert "not dry retention" in text.lower()
+    assert "0.15 mm elephant-foot compensation" in text
+    for d in (0.40, 0.60, 0.80, 1.00):
+        assert f"| {d:.2f} |" in text

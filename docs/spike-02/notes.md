@@ -2,7 +2,7 @@
 
 **Issue:** [dampcobra/Project-POP#3](https://github.com/dampcobra/Project-POP/issues/3)
 **Date:** 2026-09-04
-**Status:** Software complete and passing. **Slicer and physical validation outstanding** (Andy's printer is occupied).
+**Status:** Round 1 physically validated — **concept PASS**. Round 2 (depth sweep) artefacts ready to print.
 
 Architecture is recorded in [ADR 0002](../adr/0002-layered-relief-registration-recesses.md).
 Andy's observation sheet is generated as `artefacts/spike02/spike02-report.md`.
@@ -135,3 +135,7 @@ stacked levels stay practical for a four-colour artwork.
 3. Whether the visible support-colour outline around each seated child is
    acceptable at normal viewing distance. Its width is exactly the clearance, so
    this trades directly against fit.
+
+---
+
+Round 2 (depth sweep) continues in [round-2-depth-sweep.md](round-2-depth-sweep.md).

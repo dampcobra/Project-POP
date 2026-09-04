@@ -856,8 +856,8 @@
         "non_manifold_edges": 0,
         "self_intersections": 0,
         "volume": 17513.410416756207,
-        "face_count": 4704,
-        "vertex_count": 2354,
+        "face_count": 6110,
+        "vertex_count": 3057,
         "bounds": [
           [
             0.0,

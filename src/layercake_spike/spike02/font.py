@@ -117,6 +117,42 @@ def glyph(char: str, size: float, stroke: float) -> Glyph:
     return Glyph(char, [(list(n.ring), [list(h_) for h_ in n.holes]) for n in merged], advance)
 
 
+def glyph_segment_rects(char: str, size: float, stroke: float) -> list[Ring]:
+    """The raw, possibly overlapping segment rectangles for one character.
+
+    Each is a plain 4-gon with no holes, so extruding one can never hit the
+    collinear-boundary case that defeats the ear-clipping triangulator. Overlaps
+    are resolved by a boolean union of the resulting solids instead of by a
+    polygon union, which is what makes glyphs like "8" -- two holes whose side
+    edges are collinear -- buildable at all.
+    """
+    if char not in _GLYPHS:
+        raise ValueError(
+            f"character {char!r} is not in the coupon label font; "
+            f"supported: {''.join(sorted(_GLYPHS))!r}"
+        )
+    w, h, s = size * _WIDTH_RATIO, size, stroke
+    if char == " ":
+        return []
+    if char == ".":
+        return [[(0.0, 0.0), (s, 0.0), (s, s), (0.0, s)]]
+    rects = _segment_rects(w, h, s)
+    return [rects[seg] for seg in _GLYPHS[char]]
+
+
+def text_segment_rects(
+    text: str, x: float, y: float, size: float, stroke: float
+) -> list[Ring]:
+    """Every segment rectangle of `text`, placed, for solid-union assembly."""
+    out: list[Ring] = []
+    cursor = x
+    for char in text:
+        for rect in glyph_segment_rects(char, size, stroke):
+            out.append(_translate(rect, cursor, y))
+        cursor += glyph(char, size, stroke).advance
+    return out
+
+
 def text_rings(
     text: str, x: float, y: float, size: float, stroke: float
 ) -> list[tuple[Ring, list[Ring]]]:

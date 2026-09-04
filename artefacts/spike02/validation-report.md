@@ -10,7 +10,7 @@
 | coupon_child_m_c020_d040 | True | True | True | 2 | 0 | 0 | 172.8000 | 12 | PASS |
 | coupon_child_s_concave | True | True | True | 2 | 0 | 0 | 149.0000 | 28 | PASS |
 | coupon_child_s_radiused | True | True | True | 2 | 0 | 0 | 140.5338 | 220 | PASS |
-| coupon_fixture | True | True | True | 2 | 0 | 0 | 17513.4104 | 4704 | PASS |
+| coupon_fixture | True | True | True | 2 | 0 | 0 | 17513.4104 | 6110 | PASS |
 | stack_red | True | True | True | 2 | 0 | 0 | 952.5537 | 264 | PASS |
 | stack_white | True | True | True | 2 | 0 | 0 | 1803.8710 | 356 | PASS |
 | stack_yellow | True | True | True | 2 | 0 | 0 | 64.0000 | 12 | PASS |

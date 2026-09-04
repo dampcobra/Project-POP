@@ -10,7 +10,7 @@ from pathlib import Path
 import trimesh
 
 from .. import validate
-from . import arrange, coupon, params, report02, stack, svgdebug02
+from . import arrange, coupon, depth_followup, followup_report, params, report02, stack, svgdebug02
 
 
 def run(outdir: str | Path) -> int:
@@ -66,7 +66,56 @@ def run(outdir: str | Path) -> int:
         report02.to_markdown(summary), encoding="utf-8"
     )
 
-    return 0 if summary["pass"] else 1
+    followup_ok = _run_depth_followup(out / "depth-followup")
+    return 0 if (summary["pass"] and followup_ok) else 1
+
+
+def _run_depth_followup(out: Path) -> bool:
+    """Round 2: the depth-only sweep. Written alongside round 1's evidence."""
+    out.mkdir(parents=True, exist_ok=True)
+    result = depth_followup.build_depth_followup()
+
+    bodies = {"depth_followup_fixture": result.fixture_mesh}
+    for child in result.children:
+        bodies[f"depth_child_{child.child_id}"] = child.mesh
+    for name, mesh in bodies.items():
+        mesh.export(out / f"{name}.stl", file_type="stl")
+
+    seated = {"depth_followup_fixture": result.fixture_mesh}
+    for cell in result.cells:
+        first = next(c for c in result.children if c.depth == cell.depth)
+        seated[f"seated_d{int(round(cell.depth * 100)):03d}"] = arrange.translated(
+            first.mesh,
+            cell.origin[0],
+            cell.origin[1],
+            cell.z_planes.recess_floor,
+        )
+    arrange.assembly(seated).export(
+        out / "assembly_coregistered.stl", file_type="stl"
+    )
+
+    plate, placements = arrange.plate_layout(bodies)
+    plate.export(out / "plate_layout.stl", file_type="stl")
+
+    svgdebug02.render_pairs(
+        [(c.label, c.canonical_footprint, c.recess, c.clearance) for c in result.cells],
+        out / "debug-recesses.svg",
+        title="Spike 02 follow-up - canonical footprint vs derived recess",
+    )
+
+    mesh_reports = [validate.validate_mesh(n, m) for n, m in sorted(bodies.items())]
+    (out / "validation-report.md").write_text(
+        validate.reports_to_markdown(mesh_reports), encoding="utf-8"
+    )
+
+    summary = followup_report.build_followup_summary(result, mesh_reports, placements)
+    (out / "depth-followup-parameters.json").write_text(
+        json.dumps(summary, indent=2), encoding="utf-8"
+    )
+    (out / "depth-followup-report.md").write_text(
+        followup_report.followup_to_markdown(summary), encoding="utf-8"
+    )
+    return bool(summary["pass"])
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -104,4 +104,29 @@ def extrude(
             faces.append((a, b + n, a + n))
         start += count
 
-    return vertices, np.asarray(faces, dtype=np.int64)
+    tris = np.asarray(faces, dtype=np.int64)
+    _assert_closed(tris)
+    return vertices, tris
+
+
+def _assert_closed(faces: np.ndarray) -> None:
+    """Refuse to return a surface that is not closed.
+
+    Earcut is an ear-clipper, not a *constrained* triangulator: where two rings
+    in the same cap have collinear boundaries it may merge their boundary
+    segments. Area still comes out right, so the fault is invisible to an area
+    check, but the caps no longer share edges with the walls and the surface is
+    open. Spike 02 hit this with two holes whose side edges lined up.
+
+    Watertightness is this module's whole promise, so it is checked rather than
+    assumed.
+    """
+    edges = np.sort(faces[:, [0, 1, 1, 2, 2, 0]].reshape(-1, 2), axis=1)
+    _, counts = np.unique(edges, axis=0, return_counts=True)
+    bad = int((counts != 2).sum())
+    if bad:
+        raise ValueError(
+            f"extrusion produced {bad} non-manifold edge(s); this usually means "
+            "two rings in the same cap have collinear boundaries, which the "
+            "ear-clipping triangulator may merge"
+        )

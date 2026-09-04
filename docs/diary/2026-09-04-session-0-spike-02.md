@@ -78,3 +78,14 @@ material.
 Slicer and physical validation — Andy, once the printer frees up. The coupon
 exists to choose a provisional XY clearance and recess depth, or to narrow the
 follow-up experiment.
+
+---
+
+Round 1 physical results and the depth follow-up are recorded in
+`docs/spike-02/round-2-depth-sweep.md`. Headlines: concept PASS; the D=0.20
+failure is explained by that recess engaging only the first printed layer; the
+clearance ladder was unresolvable because process variation exceeded its step
+size; the proposed 0.80 mm sweep would have been a through-hole in a 0.8 mm
+backing, fixed by thickening the fixture; and building the D.80 label exposed a
+latent two-collinear-holes bug in Spike 01 extrude, now guarded with a
+regression test. 163 tests green.

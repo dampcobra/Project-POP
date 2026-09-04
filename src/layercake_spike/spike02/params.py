@@ -79,6 +79,54 @@ LABEL_SIZE_MM: float = 3.0
 CONTROL_CLEARANCE_MM: float = 0.10
 CONTROL_DEPTH_MM: float = 0.20
 
+# --- depth-only follow-up ---------------------------------------------------
+#
+# Round 1 established that the shallow-registration concept works and that
+# D = 0.20 mm is too shallow. The mechanism is visible in the layer arithmetic:
+# at a 0.20 mm layer height, a 0.20 mm recess engages exactly ONE layer -- the
+# first one, which carries squish, elephant-foot compensation and bed-levelling
+# error. No well-formed material does any registering at all. D = 0.40 mm brings
+# one clean layer into play, which is why it felt better.
+#
+# Round 1 could not resolve clearance: all six matrix children are the same
+# nominal square, yet nominally identical prints felt different, so process
+# variation is at least as large as the ladder step. Clearance is therefore held
+# at the process floor here and treated as a fixed condition, not a variable.
+#
+# The acceptance target is positive registration during normal glue-up handling
+# -- not dry retention, and not a friction fit.
+
+#: Recess depths under test: 2, 3, 4 and 5 layers at a 0.20 mm layer height.
+#: Deliberately brackets the expected optimum. Every previous round ended with
+#: "I wish I had more", so this one includes a depth expected to be too deep.
+DEPTH_FOLLOWUP_DEPTHS: tuple[float, ...] = (0.40, 0.60, 0.80, 1.00)
+
+#: Structural backing for the follow-up fixture.
+#:
+#: The artwork backing is H (0.8 mm), which cannot host a 0.8 mm recess -- the
+#: floor would vanish and the pipeline rejects it as a through-hole. The backing
+#: is a *structural* member, conceptually independent of the visible artwork
+#: colours (Issue #1), so thickening it is applying existing architecture rather
+#: than changing the Z model. At 1.6 mm the floor is 0.6 mm even at D = 1.00.
+DEPTH_FOLLOWUP_BACKING_MM: float = 1.6
+
+#: Held constant at the process floor. Round 1 showed the process cannot hold a
+#: distinction finer than this, so it is a fixed condition, not a chosen optimum.
+DEPTH_FOLLOWUP_CLEARANCE_MM: float = 0.05
+
+#: Identical children per depth, so print variation shows up as spread within a
+#: depth rather than masquerading as a difference between depths.
+DEPTH_FOLLOWUP_REPLICATES: int = 3
+
+#: Depth identification marker engraved into a child's top face.
+#:
+#: Engraved, not raised: a proud marker would stand above the artwork surface and
+#: spoil the flushness judgement that is part of the assessment. The count of
+#: markers encodes the depth, which is readable on a square piece that has no
+#: inherent orientation.
+MARKER_DEPTH_MM: float = 0.4
+MARKER_SIZE_MM: float = 1.6
+
 # --- derived-geometry inspection --------------------------------------------
 
 #: Minimum feature width used when *inspecting* derived fabrication geometry.

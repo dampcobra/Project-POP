@@ -1,0 +1,599 @@
+{
+  "spike": "02 follow-up - recess depth sweep",
+  "issue": "dampcobra/Project-POP#3",
+  "round": 2,
+  "question": "How deep should a registration recess be?",
+  "acceptance_target": "Positive registration during normal glue-up handling. NOT dry retention, and NOT a friction fit.",
+  "held_constant": {
+    "clearance_mm": 0.05,
+    "clearance_rationale": "Round 1 could not resolve clearance: nominally identical children felt different, so process variation is at least as large as the ladder step. Held at the process floor as a fixed condition, not chosen as an optimum.",
+    "shape": "12 x 12 mm square, identical to round 1 for comparability",
+    "slicer_layer_height_mm": 0.2,
+    "elephant_foot_compensation_mm": 0.15,
+    "visible_step_height_mm": 0.8
+  },
+  "changed_from_round_1": {
+    "backing_thickness_mm": 1.6,
+    "previous_backing_mm": 0.8,
+    "rationale": "The artwork backing is H (0.8 mm), which cannot host a 0.8 mm recess -- the floor vanishes and the pipeline rejects it as a through-hole. The backing is structural and conceptually independent of the visible artwork colours, so thickening the fixture applies existing architecture rather than altering the Z model. H is unchanged and seated tops still finish flush."
+  },
+  "replicates_per_depth": 3,
+  "criteria": {
+    "one_variable_only": true,
+    "support_continuous": true,
+    "seated_tops_flush": true,
+    "child_thickness_is_h_plus_d": true,
+    "replicates_present": true,
+    "meshes_manifold": true
+  },
+  "pass": true,
+  "cells": [
+    {
+      "depth_mm": 0.4,
+      "clearance_mm": 0.05,
+      "label": "D.40 C.05",
+      "marker_count": 1,
+      "child_thickness_mm": 1.2000000000000002,
+      "layers_engaged": 2,
+      "clean_layers_engaged": 1,
+      "support_floor_mm": 1.2000000000000002,
+      "support_floor_ok": true,
+      "seated_top_mm": 2.4000000000000004,
+      "achieved_clearance_mm": 0.04989977861803755,
+      "visible_outline_area_mm2": 2.4078336340839996,
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 1.2000000000000002,
+        "child_bottom": 1.2000000000000002,
+        "child_top": 2.4000000000000004,
+        "child_thickness": 1.2000000000000002,
+        "depth": 0.4,
+        "visible_step": 0.8
+      }
+    },
+    {
+      "depth_mm": 0.6,
+      "clearance_mm": 0.05,
+      "label": "D.60 C.05",
+      "marker_count": 2,
+      "child_thickness_mm": 1.4,
+      "layers_engaged": 3,
+      "clean_layers_engaged": 2,
+      "support_floor_mm": 1.0,
+      "support_floor_ok": true,
+      "seated_top_mm": 2.4,
+      "achieved_clearance_mm": 0.04989977861803602,
+      "visible_outline_area_mm2": 2.4078336340839144,
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 1.0,
+        "child_bottom": 1.0,
+        "child_top": 2.4,
+        "child_thickness": 1.4,
+        "depth": 0.6,
+        "visible_step": 0.8
+      }
+    },
+    {
+      "depth_mm": 0.8,
+      "clearance_mm": 0.05,
+      "label": "D.80 C.05",
+      "marker_count": 3,
+      "child_thickness_mm": 1.6,
+      "layers_engaged": 4,
+      "clean_layers_engaged": 3,
+      "support_floor_mm": 0.8,
+      "support_floor_ok": true,
+      "seated_top_mm": 2.4000000000000004,
+      "achieved_clearance_mm": 0.04989977861803678,
+      "visible_outline_area_mm2": 2.4078336340845112,
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 0.8,
+        "child_bottom": 0.8,
+        "child_top": 2.4000000000000004,
+        "child_thickness": 1.6,
+        "depth": 0.8,
+        "visible_step": 0.8
+      }
+    },
+    {
+      "depth_mm": 1.0,
+      "clearance_mm": 0.05,
+      "label": "D1.00 C.05",
+      "marker_count": 4,
+      "child_thickness_mm": 1.8,
+      "layers_engaged": 5,
+      "clean_layers_engaged": 4,
+      "support_floor_mm": 0.6000000000000001,
+      "support_floor_ok": true,
+      "seated_top_mm": 2.4000000000000004,
+      "achieved_clearance_mm": 0.04989977861803678,
+      "visible_outline_area_mm2": 2.407833634083545,
+      "z_planes": {
+        "support_top": 1.6,
+        "recess_floor": 0.6000000000000001,
+        "child_bottom": 0.6000000000000001,
+        "child_top": 2.4000000000000004,
+        "child_thickness": 1.8,
+        "depth": 1.0,
+        "visible_step": 0.8
+      }
+    }
+  ],
+  "derived_geometry_inspection": {
+    "mode": "report_only",
+    "thin_support_count": 0,
+    "corner_artifact_count": 0
+  },
+  "validation": {
+    "tool_notes": [
+      "Self-intersection counts come from this project's own triangle-triangle checker, not from trimesh, which has no such test. That checker has not been cross-checked against an independent mesh validator, is O(n^2) in its broad phase, and treats touching faces as non-intersecting. Its evidential status is unchanged from Spike 01.",
+      "Recess dilation uses a round join, so clearance is radial. Clipper2 approximates each corner arc with chords, leaving the achieved clearance a sagitta short of nominal -- under 1 um at these radii, roughly 1000x finer than a 0.4 mm nozzle. Achieved values are measured and reported, not assumed."
+    ],
+    "bodies": [
+      {
+        "body": "depth_child_d040_r1",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 171.77600000000004,
+        "face_count": 28,
+        "vertex_count": 16,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.2000000000000002
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_child_d040_r2",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 171.77600000000004,
+        "face_count": 28,
+        "vertex_count": 16,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.2000000000000002
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_child_d040_r3",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 171.77600000000004,
+        "face_count": 28,
+        "vertex_count": 16,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.2000000000000002
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_child_d060_r1",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 199.55200000000002,
+        "face_count": 44,
+        "vertex_count": 24,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.4
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_child_d060_r2",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 199.55200000000002,
+        "face_count": 44,
+        "vertex_count": 24,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.4
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_child_d060_r3",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 199.55200000000002,
+        "face_count": 44,
+        "vertex_count": 24,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.4
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_child_d080_r1",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 227.328,
+        "face_count": 60,
+        "vertex_count": 32,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.6
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_child_d080_r2",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 227.328,
+        "face_count": 60,
+        "vertex_count": 32,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.6
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_child_d080_r3",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 227.328,
+        "face_count": 60,
+        "vertex_count": 32,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.6
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_child_d100_r1",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 255.10400000000004,
+        "face_count": 76,
+        "vertex_count": 40,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.8
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_child_d100_r2",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 255.10400000000004,
+        "face_count": 76,
+        "vertex_count": 40,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.8
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_child_d100_r3",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 255.10400000000004,
+        "face_count": 76,
+        "vertex_count": 40,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            12.0,
+            12.0,
+            1.8
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      },
+      {
+        "body": "depth_followup_fixture",
+        "watertight": true,
+        "winding_consistent": true,
+        "is_volume": true,
+        "euler_number": 2,
+        "non_manifold_edges": 0,
+        "self_intersections": 0,
+        "volume": 7904.9601112546525,
+        "face_count": 2776,
+        "vertex_count": 1390,
+        "bounds": [
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            158.0,
+            32.599998474121094,
+            2.200000047683716
+          ]
+        ],
+        "tool_notes": [
+          "trimesh covers watertightness, winding consistency and Euler number. trimesh has no self-intersection test, so self-intersection here is measured by this project's own triangle-triangle checker, not by trimesh.",
+          "Faces that only touch (coplanar contact or edge grazing) are not counted as self-intersections."
+        ],
+        "ok": true
+      }
+    ]
+  },
+  "plate_layout": [
+    {
+      "name": "depth_followup_fixture",
+      "dx": 6.0,
+      "dy": 6.0,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d040_r1",
+      "dx": 170.0,
+      "dy": 6.0,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d040_r2",
+      "dx": 188.0,
+      "dy": 6.0,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d040_r3",
+      "dx": 206.0,
+      "dy": 6.0,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d060_r1",
+      "dx": 224.0,
+      "dy": 6.0,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d060_r2",
+      "dx": 6.0,
+      "dy": 44.599998474121094,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d060_r3",
+      "dx": 24.0,
+      "dy": 44.599998474121094,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d080_r1",
+      "dx": 42.0,
+      "dy": 44.599998474121094,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d080_r2",
+      "dx": 60.0,
+      "dy": 44.599998474121094,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d080_r3",
+      "dx": 78.0,
+      "dy": 44.599998474121094,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d100_r1",
+      "dx": 96.0,
+      "dy": 44.599998474121094,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d100_r2",
+      "dx": 114.0,
+      "dy": 44.599998474121094,
+      "dz": -0.0
+    },
+    {
+      "name": "depth_child_d100_r3",
+      "dx": 132.0,
+      "dy": 44.599998474121094,
+      "dz": -0.0
+    }
+  ],
+  "limitations": [
+    "Recess variation is NOT replicated: one recess per depth. Only child variation is captured, by the three replicates.",
+    "Clearance is held, not measured; this round says nothing new about it.",
+    "The S1/S2 shape controls are deliberately not re-run."
+  ]
+}
