@@ -106,15 +106,29 @@ def boolean_tree(subject: list[Ring], clip: list[Ring], op: str) -> list[NestedR
     return out
 
 
-def offset(rings: list[Ring], delta: float) -> list[Ring]:
+_JOIN_TYPES = {
+    "miter": pyclipr.JoinType.Miter,
+    "round": pyclipr.JoinType.Round,
+}
+
+
+def offset(rings: list[Ring], delta: float, join: str = "miter") -> list[Ring]:
     """Offset `rings` by `delta` mm. Negative shrinks, positive grows.
 
-    Uses a miter join so sharp corners survive a shrink/grow round trip rather
-    than being rounded away -- important because the spike's cleanup stage is
-    a morphological opening and must not quietly reshape the artwork.
+    `join="miter"` (the default) keeps sharp corners through a shrink/grow round
+    trip, which is what manufacturability cleanup needs -- a morphological opening
+    must not quietly reshape the artwork.
+
+    `join="round"` gives a true radial offset: the result is the Minkowski sum
+    with a disc, so the boundary separation is exactly `delta` everywhere
+    including at corners. That is the right semantics for a fabrication
+    clearance, where a mitre spike would give more clearance on the diagonal
+    than was asked for.
     """
     if not rings:
         return []
+    if join not in _JOIN_TYPES:
+        raise ValueError(f"unknown join {join!r}; expected one of {sorted(_JOIN_TYPES)}")
     o = pyclipr.ClipperOffset()
     o.scaleFactor = _SCALE
     o.miterLimit = _MITER_LIMIT
@@ -122,7 +136,7 @@ def offset(rings: list[Ring], delta: float) -> list[Ring]:
         if len(ring) >= 3:
             o.addPath(
                 np.asarray(ring, dtype=float),
-                pyclipr.JoinType.Miter,
+                _JOIN_TYPES[join],
                 pyclipr.EndType.Polygon,
             )
     return _to_rings(o.execute(delta))
