@@ -99,14 +99,29 @@ class FabricationResult:
     def seating_path(self, ancestor: str, descendant: str) -> tuple[str, ...]:
         """The chain of regions seated one into the next, ancestor first.
 
-        Read off the derived bodies rather than the artwork: what accumulates
-        play is an actual seating, and only a body that hosts a pocket for its
-        child provides one. Under a strategy that seats nothing, the chain is
-        empty and so is the freedom.
+        Read off the derived bodies rather than the artwork: the path is built
+        from actual seating relationships, so each step is a body that hosts a
+        pocket for the next.
 
-        Raises `FabricationError` if `descendant` does not in fact sit inside
-        `ancestor` -- which is what makes asking about two siblings an error
-        rather than a number.
+            registration freedom is defined only along actual derived
+            seating relationships.
+
+            No seating relationship
+                -> no registration-freedom value under this model.
+
+        So a missing seating is not a zero. It raises, because the model has
+        nothing to say rather than something to say that happens to be zero.
+        Two siblings are the clearest example: they seat into the same parent,
+        never into each other, and the question has no answer.
+
+        This matters most for strategies that do not yet exist. An island insert
+        seats into no pocket, but that must not be read as "no play" -- its
+        location could be set by entirely different geometry, which has not been
+        designed. Raising keeps that question open; returning zero would answer
+        it wrongly and silently.
+
+        Raises `FabricationError` if no chain of seatings leads from `ancestor`
+        down to `descendant`.
         """
         for region_id in (ancestor, descendant):
             if region_id not in self.bodies.region_ids():
@@ -142,10 +157,14 @@ class FabricationResult:
         with relief depth however deep the artwork goes.
 
         It is **ancestry-path accumulation, not stacking-level accumulation**.
-        Siblings sit at the same level and contribute nothing to each other;
-        asking for the freedom between two of them raises.
+        Siblings sit at the same level and contribute nothing to each other.
 
-        A region relative to itself has no seating and therefore no freedom.
+        Defined only where a seating path exists -- see `seating_path`. Where
+        none does, this raises rather than returning zero: the model has no
+        value to give, which is not the same as a value of zero.
+
+        A region relative to itself is the one degenerate case: the path is
+        real but has no seatings on it, so the freedom is genuinely 0.0.
 
         Note: the per-seating clearance is read from the profile, which is
         correct while every pocket is cut at the profile's clearance. Should a
@@ -153,15 +172,14 @@ class FabricationResult:
         and this should read it from there instead.
         """
         path = self.seating_path(ancestor, descendant)
-        clearance = self.profile.per_side_clearance.mm
-        return sum(
-            clearance
-            for parent, child in zip(path, path[1:])
-            if self.body_for(parent).hosts(child)
-        )
+        # Every consecutive pair on a seating path is a seating by
+        # construction, so each contributes its per-side clearance. There is
+        # deliberately no "and zero otherwise" branch here: a step that is not
+        # a seating cannot be on the path at all.
+        return self.profile.per_side_clearance.mm * (len(path) - 1)
 
     def _host_of(self, region_id: str) -> str | None:
-        """The body whose pocket seats this region, if any."""
+        """The body whose pocket seats this region, or None if nothing seats it."""
         for body in self.bodies:
             if body.hosts(region_id):
                 return body.region_id
