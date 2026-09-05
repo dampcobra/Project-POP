@@ -89,8 +89,15 @@ def build_summary(coupon_result, stacks: dict[float, object], mesh_reports, plac
             < 1e-12
             for c in cells
         ),
+        # A relationship, not literals: backing is an independent property since
+        # Session 01, so pinning 0.8/1.6/2.4 would re-couple it to H.
         "three_level_z_arithmetic": all(
-            b["completed_tops_mm"] == [0.8, 1.6, 2.4] for b in stack_blocks.values()
+            b["completed_tops_mm"]
+            == [
+                round(params.BACKING_THICKNESS_MM + n * params.H_VISIBLE_STEP_MM, 9)
+                for n in range(3)
+            ]
+            for b in stack_blocks.values()
         ),
         "island_seated_not_stacked": all(
             b["levels"][1]["fabrication_hole_count"] == 0
@@ -116,7 +123,8 @@ def build_summary(coupon_result, stacks: dict[float, object], mesh_reports, plac
             "clearance_definition": "per-side (radial), recess dilated outward from the canonical child footprint; the child is never shrunk",
             "join_type": "round",
             "fixture_support_thickness_mm": params.FIXTURE_SUPPORT_MM,
-            "stack_backing_thickness_mm": params.STACK_BACKING_MM,
+            "backing_thickness_mm": params.BACKING_THICKNESS_MM,
+            "backing_is_independent_of_h": True,
         },
         "criteria": criteria,
         "pass": all(criteria.values()),
@@ -190,8 +198,9 @@ def to_markdown(summary: dict) -> str:
         f"- Clearance: {summary['model']['clearance_definition']}, {summary['model']['join_type']} join.",
         f"- Coupon fixture support: {summary['model']['fixture_support_thickness_mm']} mm "
         "(deliberately thicker than H so floor thickness cannot confound the fit result).",
-        f"- Three-level stack backing: {summary['model']['stack_backing_thickness_mm']} mm "
-        "(kept at H so the 0.8 / 1.6 / 2.4 mm result is genuinely validated).",
+        f"- Structural backing: {summary['model']['backing_thickness_mm']} mm -- an "
+        "independent physical property, **not** derived from H (Session 01). Its "
+        "own rule is the recess it must host plus a sound floor.",
         "",
         "## Test cells",
         "",

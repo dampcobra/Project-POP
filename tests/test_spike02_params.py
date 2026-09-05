@@ -35,7 +35,8 @@ def test_every_z_dimension_is_a_whole_number_of_layers():
     dims = {
         "H": params.H_VISIBLE_STEP_MM,
         "fixture_support": params.FIXTURE_SUPPORT_MM,
-        "stack_backing": params.STACK_BACKING_MM,
+        "backing": params.BACKING_THICKNESS_MM,
+        "round1_as_printed_backing": params.ROUND1_AS_PRINTED_BACKING_MM,
         "label_boss": params.LABEL_BOSS_MM,
     }
     for d in params.DEPTHS_MM:
@@ -80,3 +81,48 @@ def test_shape_controls_use_a_documented_mid_matrix_setting():
             assert c.depth == params.CONTROL_DEPTH_MM
     assert params.CONTROL_CLEARANCE_MM in params.CLEARANCES_MM
     assert params.CONTROL_DEPTH_MM in params.DEPTHS_MM
+
+
+# --- backing thickness is independent of visible step height -----------------
+
+
+def test_backing_thickness_is_not_derived_from_visible_step_height():
+    """Session 01 decision: the backing is a separate physical property.
+
+    It was previously 0.8 mm only because H is 0.8 mm. Nothing about a
+    structural backing follows from how tall one artwork level looks.
+    """
+    assert params.BACKING_THICKNESS_MM != params.H_VISIBLE_STEP_MM
+
+
+def test_backing_thickness_is_derived_from_what_it_must_support():
+    """Its rule is: deep enough for the recess it hosts, plus a sound floor."""
+    assert math.isclose(
+        params.BACKING_THICKNESS_MM,
+        params.MEASURED_DEFAULT_DEPTH_MM + params.MIN_RECESS_FLOOR_MM,
+        abs_tol=1e-9,
+    )
+
+
+def test_minimum_recess_floor_is_named_and_is_a_whole_number_of_layers():
+    assert params.MIN_RECESS_FLOOR_MM == 0.4
+    assert _is_layer_multiple(params.MIN_RECESS_FLOOR_MM)
+
+
+def test_backing_can_host_the_measured_default_recess_depth():
+    from layercake_spike.spike02 import fabricate
+
+    f = fabricate.check_floor(
+        "backing", "child", params.BACKING_THICKNESS_MM, params.MEASURED_DEFAULT_DEPTH_MM
+    )
+    assert f.ok
+    assert f.floor_mm >= params.MIN_RECESS_FLOOR_MM - 1e-9
+
+
+def test_backing_thickness_is_a_whole_number_of_layers():
+    assert _is_layer_multiple(params.BACKING_THICKNESS_MM)
+
+
+def test_round_1_as_printed_backing_is_preserved_as_history():
+    """The printed evidence used a 0.8 mm backing; that must stay reproducible."""
+    assert params.ROUND1_AS_PRINTED_BACKING_MM == 0.8

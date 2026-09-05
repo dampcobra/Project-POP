@@ -70,12 +70,18 @@ class StackResult:
 def build_stack(
     clearance: float = params.CONTROL_CLEARANCE_MM,
     depth: float = params.CONTROL_DEPTH_MM,
+    backing: float = params.BACKING_THICKNESS_MM,
 ) -> StackResult:
-    """Derive the white -> red -> yellow stack from Spike 01's canonical artwork."""
+    """Derive the white -> red -> yellow stack from Spike 01's canonical artwork.
+
+    `backing` is an independent structural property, not derived from `H`
+    (Session 01 decision). Pass `params.ROUND1_AS_PRINTED_BACKING_MM` to
+    reproduce the article Andy printed in round 1.
+    """
     h = params.H_VISIBLE_STEP_MM
 
     # --- level 1: white backing, sitting on the plate ------------------------
-    white_thickness = params.STACK_BACKING_MM
+    white_thickness = backing
     white_z = fabricate.ZPlanes(
         support_top=0.0,
         recess_floor=0.0,

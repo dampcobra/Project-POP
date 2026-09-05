@@ -16,6 +16,7 @@
 | Date | Change |
 |---|---|
 | 2026-09-04 | Accepted on the software model; parameters provisional pending physical validation. |
+| 2026-09-05 | **Backing decoupled from H, adopted.** Session 01 (Andy + Elara). The backing is an independent structural property with its own rule -- the recess it must host plus a sound floor -- and no longer inherits the visible step height. Recorded under decision 8's backing consequence, which had flagged it. |
 | 2026-09-04 | **Physically validated.** Round 1: concept PASS; D = 0.20 mm too shallow. Round 2 (depth sweep): **D = 0.80 mm recorded as the provisional measured default**. Clearance remains a *held* process-floor value, not a measured optimum. New decision 8 records the measured parameters and their scope. |
 
 ## Context
@@ -200,7 +201,8 @@ ladder step. Round 2 held it fixed and therefore says nothing new about it.
 tightest was least bad."* Treat it as the process floor to build at, and do not
 tune against it at finer resolution without an experiment that can resolve it.
 
-**Consequence: the structural backing must be decoupled from H in the product.**
+**Consequence: the structural backing must be decoupled from H in the product.
+ADOPTED 2026-09-05 (Session 01).**
 
 At H = 0.8 mm the *artwork* backing cannot host a 0.80 mm recess -- the floor
 would be zero and the pipeline correctly refuses it as a through-hole. Adopting
@@ -218,6 +220,27 @@ conceptually independent of the visible artwork colours (Issue #1). Visible step
 heights are unaffected; only the base thickness and therefore the overall stack
 height change. **Middle bodies need no change** -- their thickness is `H + D`, so
 it grows with depth and their floor stays at H regardless.
+
+*Adopted in Session 01, ahead of the product model, so nothing gets built on the
+coupled assumption.* The backing now has its own rule rather than a value
+inherited from `H`:
+
+    backing thickness = deepest recess it hosts + minimum recess floor
+                      = 0.80 + 0.40 = 1.20 mm
+
+`MIN_RECESS_FLOOR_MM` (0.40 mm, two layers) is named for the first time here; it
+had existed only as a number checked inside individual tests, which is part of
+why the backing's thickness looked like a free choice rather than a consequence.
+
+The default sits **exactly at that minimum** -- 0.40 mm of material under the
+recess. It is the rule's output, not a margin. Raising `MIN_RECESS_FLOOR_MM` is
+the way to buy margin if the product wants it; that is an open question, not a
+decision taken here.
+
+The three-level demo stack therefore now finishes at **1.2 / 2.0 / 2.8 mm**
+rather than 0.8 / 1.6 / 2.4. Every visible step is still `H`. The round-1
+as-printed configuration is preserved as `ROUND1_AS_PRINTED_BACKING_MM` and is
+still reproducible from the code, so the printed evidence remains checkable.
 
 **Acceptance target used.** Positive registration during normal glue-up
 handling -- not dry retention, and not a friction fit. Depth buys retention and

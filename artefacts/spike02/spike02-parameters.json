@@ -14,7 +14,8 @@
     "clearance_definition": "per-side (radial), recess dilated outward from the canonical child footprint; the child is never shrunk",
     "join_type": "round",
     "fixture_support_thickness_mm": 1.6,
-    "stack_backing_thickness_mm": 0.8
+    "backing_thickness_mm": 1.2,
+    "backing_is_independent_of_h": true
   },
   "criteria": {
     "clearance_present_numerically": true,
@@ -273,9 +274,9 @@
       "clearance_mm": 0.1,
       "depth_mm": 0.2,
       "completed_tops_mm": [
-        0.8,
-        1.6,
-        2.4
+        1.2,
+        2.0,
+        2.8
       ],
       "cumulative_registration_freedom_mm": 0.2,
       "levels": [
@@ -288,13 +289,13 @@
             "support_top": 0.0,
             "recess_floor": 0.0,
             "child_bottom": 0.0,
-            "child_top": 0.8,
-            "child_thickness": 0.8,
+            "child_top": 1.2,
+            "child_thickness": 1.2,
             "depth": 0.0,
-            "visible_step": 0.8
+            "visible_step": 1.2
           },
           "hosts_recess_for": "red",
-          "support_floor_mm": 0.6000000000000001,
+          "support_floor_mm": 1.0,
           "visible_support_outline": {
             "width_mm": 0.09979968279628097,
             "area_mm2": 14.64513992460445
@@ -306,10 +307,10 @@
           "canonical_hole_count": 1,
           "fabrication_hole_count": 0,
           "z": {
-            "support_top": 0.8,
-            "recess_floor": 0.6000000000000001,
-            "child_bottom": 0.6000000000000001,
-            "child_top": 1.6,
+            "support_top": 1.2,
+            "recess_floor": 1.0,
+            "child_bottom": 1.0,
+            "child_top": 2.0,
             "child_thickness": 1.0,
             "depth": 0.2,
             "visible_step": 0.8
@@ -327,10 +328,10 @@
           "canonical_hole_count": 0,
           "fabrication_hole_count": 0,
           "z": {
-            "support_top": 1.6,
-            "recess_floor": 1.4000000000000001,
-            "child_bottom": 1.4000000000000001,
-            "child_top": 2.4000000000000004,
+            "support_top": 2.0,
+            "recess_floor": 1.8,
+            "child_bottom": 1.8,
+            "child_top": 2.8,
             "child_thickness": 1.0,
             "depth": 0.2,
             "visible_step": 0.8
@@ -345,9 +346,9 @@
       "clearance_mm": 0.1,
       "depth_mm": 0.4,
       "completed_tops_mm": [
-        0.8,
-        1.6,
-        2.4
+        1.2,
+        2.0,
+        2.8
       ],
       "cumulative_registration_freedom_mm": 0.2,
       "levels": [
@@ -360,13 +361,13 @@
             "support_top": 0.0,
             "recess_floor": 0.0,
             "child_bottom": 0.0,
-            "child_top": 0.8,
-            "child_thickness": 0.8,
+            "child_top": 1.2,
+            "child_thickness": 1.2,
             "depth": 0.0,
-            "visible_step": 0.8
+            "visible_step": 1.2
           },
           "hosts_recess_for": "red",
-          "support_floor_mm": 0.4,
+          "support_floor_mm": 0.7999999999999999,
           "visible_support_outline": {
             "width_mm": 0.09979968279628097,
             "area_mm2": 14.64513992460445
@@ -378,10 +379,10 @@
           "canonical_hole_count": 1,
           "fabrication_hole_count": 0,
           "z": {
-            "support_top": 0.8,
-            "recess_floor": 0.4,
-            "child_bottom": 0.4,
-            "child_top": 1.6,
+            "support_top": 1.2,
+            "recess_floor": 0.7999999999999999,
+            "child_bottom": 0.7999999999999999,
+            "child_top": 2.0,
             "child_thickness": 1.2000000000000002,
             "depth": 0.4,
             "visible_step": 0.8
@@ -399,10 +400,10 @@
           "canonical_hole_count": 0,
           "fabrication_hole_count": 0,
           "z": {
-            "support_top": 1.6,
-            "recess_floor": 1.2000000000000002,
-            "child_bottom": 1.2000000000000002,
-            "child_top": 2.4000000000000004,
+            "support_top": 2.0,
+            "recess_floor": 1.6,
+            "child_bottom": 1.6,
+            "child_top": 2.8000000000000003,
             "child_thickness": 1.2000000000000002,
             "depth": 0.4,
             "visible_step": 0.8
@@ -891,12 +892,12 @@
           [
             8.0,
             6.0,
-            0.6000000000000001
+            1.0
           ],
           [
             44.0,
             40.0,
-            1.6
+            2.0
           ]
         ],
         "tool_notes": [
@@ -913,7 +914,7 @@
         "euler_number": 2,
         "non_manifold_edges": 0,
         "self_intersections": 0,
-        "volume": 1803.8709720150791,
+        "volume": 2803.8709720150787,
         "face_count": 356,
         "vertex_count": 180,
         "bounds": [
@@ -925,7 +926,7 @@
           [
             50.0,
             50.0,
-            0.8
+            1.2
           ]
         ],
         "tool_notes": [
@@ -942,19 +943,19 @@
         "euler_number": 2,
         "non_manifold_edges": 0,
         "self_intersections": 0,
-        "volume": 64.00000000000003,
+        "volume": 63.99999999999997,
         "face_count": 12,
         "vertex_count": 8,
         "bounds": [
           [
             14.0,
             12.0,
-            1.4000000000000001
+            1.8
           ],
           [
             22.0,
             20.0,
-            2.4000000000000004
+            2.8
           ]
         ],
         "tool_notes": [
@@ -982,7 +983,7 @@
       "name": "stack_red",
       "dx": -2.0,
       "dy": 76.0,
-      "dz": -0.6000000000000001
+      "dz": -1.0
     },
     {
       "name": "coupon_child_s_concave",
@@ -1036,7 +1037,7 @@
       "name": "stack_yellow",
       "dx": 180.0,
       "dy": 70.0,
-      "dz": -1.4000000000000001
+      "dz": -1.8
     }
   ],
   "not_verified_here": [

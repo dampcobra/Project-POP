@@ -69,7 +69,7 @@ def build_followup_summary(result, mesh_reports, placements) -> dict:
         },
         "changed_from_round_1": {
             "backing_thickness_mm": backing,
-            "previous_backing_mm": params.STACK_BACKING_MM,
+            "previous_backing_mm": params.ROUND1_AS_PRINTED_BACKING_MM,
             "rationale": (
                 "The artwork backing is H (0.8 mm), which cannot host a 0.8 mm "
                 "recess -- the floor vanishes and the pipeline rejects it as a "

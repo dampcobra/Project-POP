@@ -41,7 +41,7 @@ def test_backing_is_thickened_so_depth_is_the_only_variable():
 
 
 def test_the_previous_backing_could_not_have_run_this_experiment():
-    assert params.STACK_BACKING_MM - 0.80 <= 0.0
+    assert params.ROUND1_AS_PRINTED_BACKING_MM - 0.80 <= 0.0
 
 
 def test_clearance_is_held_at_the_process_floor():
@@ -190,14 +190,14 @@ def test_clearance_is_recorded_as_held_not_measured():
     assert params.HELD_CLEARANCE_MM == params.DEPTH_FOLLOWUP_CLEARANCE_MM
 
 
-def test_the_artwork_backing_cannot_host_the_measured_default():
-    """Adopting D=0.80 forces the structural backing to be decoupled from H."""
+def test_a_backing_equal_to_h_cannot_host_the_measured_default():
+    """This is precisely why backing was decoupled from H in Session 01."""
     from layercake_spike.spike02 import fabricate
 
     at_h = fabricate.check_floor(
-        "backing", "child", params.STACK_BACKING_MM, params.MEASURED_DEFAULT_DEPTH_MM
+        "backing", "child", params.H_VISIBLE_STEP_MM, params.MEASURED_DEFAULT_DEPTH_MM
     )
-    assert not at_h.ok, "a 0.8 mm backing would leave no floor under a 0.80 mm recess"
+    assert not at_h.ok, "a backing equal to H leaves no floor under a 0.80 mm recess"
 
     at_min = fabricate.check_floor(
         "backing",

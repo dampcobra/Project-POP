@@ -60,8 +60,9 @@ def test_assembly_places_bodies_at_true_z(built):
     asm = trimesh.load(out / "assembly_coregistered.stl")
     # STL stores float32, so reloaded coordinates carry ~1e-7 of rounding
     assert abs(asm.bounds[0][2]) < 1e-4
-    # the tallest thing in the assembly is the three-level stack finishing at 2.4
-    assert abs(asm.bounds[1][2] - 2.4) < 1e-4, asm.bounds[1][2]
+    # the tallest thing in the assembly is the three-level stack's top level
+    tallest = params.BACKING_THICKNESS_MM + 2 * params.H_VISIBLE_STEP_MM
+    assert abs(asm.bounds[1][2] - tallest) < 1e-4, asm.bounds[1][2]
 
 
 def test_assembly_seats_each_child_at_its_recess_floor(built):
@@ -84,8 +85,13 @@ def test_summary_records_the_z_model_and_criteria(built):
     assert s["process_conditions"]["slicer_layer_height_mm"] == 0.2
     assert s["model"]["child_thickness_rule"] == "H + D"
     assert s["model"]["join_type"] == "round"
+    # relationship, not literals -- backing is independent of H since Session 01
+    expected = [
+        round(params.BACKING_THICKNESS_MM + n * params.H_VISIBLE_STEP_MM, 9)
+        for n in range(3)
+    ]
     for block in s["three_level_stack"].values():
-        assert block["completed_tops_mm"] == [0.8, 1.6, 2.4]
+        assert block["completed_tops_mm"] == expected
 
 
 def test_summary_records_registration_freedom_and_visible_outline(built):

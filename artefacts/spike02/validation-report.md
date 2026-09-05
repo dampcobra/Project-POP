@@ -12,7 +12,7 @@
 | coupon_child_s_radiused | True | True | True | 2 | 0 | 0 | 140.5338 | 220 | PASS |
 | coupon_fixture | True | True | True | 2 | 0 | 0 | 17513.4104 | 6110 | PASS |
 | stack_red | True | True | True | 2 | 0 | 0 | 952.5537 | 264 | PASS |
-| stack_white | True | True | True | 2 | 0 | 0 | 1803.8710 | 356 | PASS |
+| stack_white | True | True | True | 2 | 0 | 0 | 2803.8710 | 356 | PASS |
 | stack_yellow | True | True | True | 2 | 0 | 0 | 64.0000 | 12 | PASS |
 
 ## Bounding boxes (shared origin)
@@ -28,9 +28,9 @@
 | coupon_child_s_concave | 79.000..93.000 | 35.000..49.000 | 0.000..1.000 |
 | coupon_child_s_radiused | 113.000..125.000 | 33.000..45.000 | 0.000..1.000 |
 | coupon_fixture | 0.000..158.000 | 0.000..70.000 | 0.000..2.200 |
-| stack_red | 8.000..44.000 | 6.000..40.000 | 0.600..1.600 |
-| stack_white | 0.000..50.000 | 0.000..50.000 | 0.000..0.800 |
-| stack_yellow | 14.000..22.000 | 12.000..20.000 | 1.400..2.400 |
+| stack_red | 8.000..44.000 | 6.000..40.000 | 1.000..2.000 |
+| stack_white | 0.000..50.000 | 0.000..50.000 | 0.000..1.200 |
+| stack_yellow | 14.000..22.000 | 12.000..20.000 | 1.800..2.800 |
 
 ## Tool coverage and limitations
 

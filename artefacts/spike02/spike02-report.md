@@ -13,7 +13,7 @@ Issue: dampcobra/Project-POP#3. Construction: layered relief: white backing -> r
 - Visible step height `H` = 0.8 mm; child thickness = `H + D`.
 - Clearance: per-side (radial), recess dilated outward from the canonical child footprint; the child is never shrunk, round join.
 - Coupon fixture support: 1.6 mm (deliberately thicker than H so floor thickness cannot confound the fit result).
-- Three-level stack backing: 0.8 mm (kept at H so the 0.8 / 1.6 / 2.4 mm result is genuinely validated).
+- Structural backing: 1.2 mm -- an independent physical property, **not** derived from H (Session 01). Its own rule is the recess it must host plus a sound floor.
 
 ## Test cells
 
@@ -34,8 +34,8 @@ Issue: dampcobra/Project-POP#3. Construction: layered relief: white backing -> r
 
 | Depth (mm) | Completed tops (mm) | Cumulative registration freedom (mm) |
 |---|---|---|
-| 0.20 | 0.8 / 1.6 / 2.4 | 0.20 |
-| 0.40 | 0.8 / 1.6 / 2.4 | 0.20 |
+| 0.20 | 1.2 / 2.0 / 2.8 | 0.20 |
+| 0.40 | 1.2 / 2.0 / 2.8 | 0.20 |
 
 Completed tops are invariant in seating depth, which is what makes depth a free experimental variable. Registration freedom accumulates: each seating adds its own per-side play, so the topmost piece can sit further off nominal than any single joint allows. Reported as evidence; solving it is out of scope.
 

@@ -57,9 +57,16 @@ DEPTHS_MM: tuple[float, ...] = (0.20, 0.40)
 #: The fixture is a test article; its own visible step height is irrelevant.
 FIXTURE_SUPPORT_MM: float = 1.6
 
-#: Backing thickness for the representative three-level artwork stack. Kept at H
-#: so the intended 0.8 / 1.6 / 2.4 mm result is genuinely validated.
-STACK_BACKING_MM: float = 0.8
+#: Minimum material left beneath a registration recess.
+#:
+#: Two layers at 0.20 mm. Previously this concept was implicit -- it existed only
+#: as a number checked inside individual tests -- which is part of why the
+#: backing's thickness looked like a free choice rather than a consequence.
+#: `check_floor` rejects a non-positive floor; this is the value we design to.
+MIN_RECESS_FLOOR_MM: float = 0.4
+
+#: Backing thickness is defined below, with the measured depth it is derived
+#: from. See BACKING_THICKNESS_MM.
 
 #: Height of raised label lettering on the fixture.
 LABEL_BOSS_MM: float = 0.6
@@ -150,13 +157,12 @@ MEASURED_DEFAULT_DEPTH_MM: float = 0.80
 #: by the data, not a tested result**; only the 0.20 mm case has been measured.
 MEASURED_DEFAULT_DEPTH_LAYERS: int = 4
 
-#: Minimum structural backing thickness needed to host the measured default.
+#: Minimum structural backing thickness able to host the measured default.
 #:
-#: Consequence worth stating plainly: at H = 0.8 mm the *artwork* backing cannot
-#: host a 0.80 mm recess -- the floor would be zero and the pipeline refuses it.
-#: Adopting this default therefore requires the structural backing to be
-#: decoupled from H in the product, not just in the test fixture. 1.2 mm leaves a
-#: two-layer floor; 1.6 mm leaves four.
+#: At H = 0.8 mm the artwork backing could not host a 0.80 mm recess -- the floor
+#: would be zero and the pipeline refuses it. That is what forced the backing to
+#: be decoupled from H, adopted in Session 01; see BACKING_THICKNESS_MM, which is
+#: the chosen default and currently equals this minimum.
 MIN_BACKING_FOR_DEFAULT_DEPTH_MM: float = 1.2
 
 #: Clearance remains a HELD process-floor value, not a measured optimum.
@@ -167,6 +173,40 @@ MIN_BACKING_FOR_DEFAULT_DEPTH_MM: float = 1.2
 #: separately from the depth result so the two are not read with equal
 #: confidence.
 HELD_CLEARANCE_MM: float = 0.05
+
+#: Structural backing thickness. **Independent of the visible step height.**
+#:
+#: Session 01 decision (Andy and Elara): the backing is a separate physical
+#: property and does not inherit H. Until now it was 0.8 mm only because H is
+#: 0.8 mm, which is a coincidence of the spike rather than anything physical --
+#: nothing about a structural member follows from how tall one artwork level
+#: looks.
+#:
+#: Its own rule is what it must support: deep enough for the recess it hosts,
+#: plus a sound floor. At the measured default depth that is
+#: 0.80 + 0.40 = 1.20 mm. The coupled 0.8 mm value could not host that depth at
+#: all -- the floor would be zero and the pipeline refuses it as a through-hole.
+#:
+#: This is a *thickness*, not a visible step: the backing sits on the plate, so
+#: it shows its full height. Changing it moves overall stack height and nothing
+#: else; every artwork step stays H.
+#:
+#: Stated as a literal rather than computed, because
+#: `0.80 + 0.40` evaluates to 1.2000000000000002 in binary floating point and
+#: that artifact would leak into exported geometry and reports. The derivation is
+#: asserted by test instead.
+#:
+#: NOTE: this sits *exactly* at the minimum floor -- 0.40 mm of material under
+#: the recess, two layers. It is the rule's output, not a margin. Raising
+#: MIN_RECESS_FLOOR_MM is the way to buy margin if the product wants it.
+BACKING_THICKNESS_MM: float = 1.2
+
+#: The backing thickness used for the round-1 article Andy actually printed.
+#:
+#: Kept so the recorded physical evidence stays reproducible from the code. It is
+#: history, not a default: it equals H, which is exactly the coupling that has
+#: since been removed, and it cannot host the measured default recess depth.
+ROUND1_AS_PRINTED_BACKING_MM: float = 0.8
 
 # --- derived-geometry inspection --------------------------------------------
 

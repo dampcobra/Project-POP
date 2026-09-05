@@ -2,7 +2,7 @@
 
 **Issue:** [dampcobra/Project-POP#3](https://github.com/dampcobra/Project-POP/issues/3)
 **Date:** 2026-09-04
-**Status:** Physically validated, both rounds. **Concept PASS**; provisional measured default recess depth **0.80 mm**.
+**Status:** Physically validated, both rounds. **Concept PASS**; provisional measured default recess depth **0.80 mm**. Backing thickness decoupled from `H` in Session 01 (2026-09-05).
 
 Architecture is recorded in [ADR 0002](../adr/0002-layered-relief-registration-recesses.md).
 Andy's observation sheet is generated as `artefacts/spike02/spike02-report.md`.
@@ -10,7 +10,7 @@ Andy's observation sheet is generated as `artefacts/spike02/spike02-report.md`.
 ## Running it
 
 ```bash
-.venv/Scripts/python.exe -m pytest                    # 170 tests
+.venv/Scripts/python.exe -m pytest                    # 181 tests
 .venv/Scripts/python.exe -m layercake_spike.spike02   # writes artefacts/spike02/
 ```
 
@@ -41,10 +41,10 @@ All criteria pass:
 | Recess depth correct | PASS |
 | Support continuous beneath every recess | PASS — worst floor 1.20 mm |
 | Child thickness follows `H + D` | PASS |
-| Three-level Z arithmetic 0.8 / 1.6 / 2.4 | PASS at both depths |
+| Three-level Z arithmetic (backing + n·H) | PASS at both depths |
 | Enclosed island seated from above, not stacked | PASS |
 | All meshes manifold | PASS |
-| Spike 01 tests still green | PASS — 55 of the 137 |
+| Spike 01 tests still green | PASS — 55 of the 181 |
 
 Coupon plate footprint is 214 × 110 mm, comfortably inside a P1S bed.
 

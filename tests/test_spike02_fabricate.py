@@ -64,7 +64,8 @@ def test_derivation_does_not_mutate_the_canonical_child():
 
 def test_z_planes_reproduce_the_intended_three_level_result():
     for d in params.DEPTHS_MM:
-        white_top = params.STACK_BACKING_MM
+        # the as-printed round-1 backing, so this pins the known-good result
+        white_top = params.ROUND1_AS_PRINTED_BACKING_MM
         red = fabricate.z_planes(white_top, d)
         yellow = fabricate.z_planes(red.child_top, d)
         assert math.isclose(white_top, 0.8, abs_tol=1e-12)

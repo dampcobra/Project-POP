@@ -208,6 +208,14 @@ unaffected — only base thickness and overall stack height change. **Middle bod
 need no change**: their thickness is `H + D`, so it grows with depth and their
 floor stays at `H` regardless.
 
+> **Adopted 2026-09-05 (Session 01).** The backing is now an independent
+> parameter with its own rule — `deepest recess + minimum floor` = 1.2 mm — and
+> no longer inherits `H`. The demo stack consequently finishes at
+> 1.2 / 2.0 / 2.8 mm; visible steps are unchanged at `H` each. The round-1
+> as-printed 0.8 mm configuration is preserved as
+> `ROUND1_AS_PRINTED_BACKING_MM` and remains reproducible. See ADR 0002
+> decision 8 and `docs/diary/2026-09-05-session-01.md`.
+
 ## Limitations of this round
 
 - **Recess variation is not replicated** — one recess per depth. Only child

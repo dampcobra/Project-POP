@@ -20,10 +20,22 @@ def built():
     return {d: stack.build_stack(depth=d) for d in params.DEPTHS_MM}
 
 
-def test_completed_tops_are_08_16_24_for_every_depth(built):
+def test_completed_tops_step_by_h_from_the_backing_for_every_depth(built):
+    """The Z model is a *relationship*, not the literals a 0.8 mm backing gave.
+
+    Backing is an independent property since Session 01, so pinning 0.8/1.6/2.4
+    here would re-couple the two through the test suite. The as-printed literals
+    are pinned separately, against the as-printed backing.
+    """
+    backing = params.BACKING_THICKNESS_MM
+    h = params.H_VISIBLE_STEP_MM
     for depth, s in built.items():
         tops = [round(t, 9) for t in s.completed_tops]
-        assert tops == [0.8, 1.6, 2.4], (depth, tops)
+        assert tops == [
+            round(backing, 9),
+            round(backing + h, 9),
+            round(backing + 2 * h, 9),
+        ], (depth, tops)
 
 
 def test_child_thickness_follows_h_plus_d(built):
@@ -113,3 +125,47 @@ def test_visible_step_is_h_at_every_level(built):
         tops = s.completed_tops
         assert math.isclose(tops[1] - tops[0], params.H_VISIBLE_STEP_MM, abs_tol=1e-12)
         assert math.isclose(tops[2] - tops[1], params.H_VISIBLE_STEP_MM, abs_tol=1e-12)
+
+
+# --- backing decoupled from H (Session 01) -----------------------------------
+
+
+def test_stack_takes_its_backing_as_a_parameter():
+    s = stack.build_stack(backing=1.6)
+    assert math.isclose(s.by_name["white"].z.child_thickness, 1.6, abs_tol=1e-12)
+
+
+def test_visible_steps_are_h_regardless_of_backing_thickness():
+    """Decoupling must not disturb the artwork: every step stays H."""
+    for backing in (0.8, 1.2, 1.6, 2.0):
+        s = stack.build_stack(backing=backing, depth=0.20)
+        tops = s.completed_tops
+        assert math.isclose(tops[0], backing, abs_tol=1e-12), backing
+        assert math.isclose(tops[1] - tops[0], params.H_VISIBLE_STEP_MM, abs_tol=1e-12)
+        assert math.isclose(tops[2] - tops[1], params.H_VISIBLE_STEP_MM, abs_tol=1e-12)
+
+
+def test_default_backing_can_host_the_measured_default_depth():
+    """The coupled 0.8 mm backing could not; that is why it was decoupled."""
+    s = stack.build_stack(depth=params.MEASURED_DEFAULT_DEPTH_MM)
+    white = s.by_name["white"]
+    assert white.floor.ok
+    assert white.floor.floor_mm >= params.MIN_RECESS_FLOOR_MM - 1e-9
+
+
+def test_the_old_coupled_backing_still_cannot_host_it():
+    with pytest.raises(ValueError, match="through-hole"):
+        stack.build_stack(
+            backing=params.ROUND1_AS_PRINTED_BACKING_MM,
+            depth=params.MEASURED_DEFAULT_DEPTH_MM,
+        )
+
+
+def test_round_1_as_printed_geometry_is_still_reproducible():
+    """The printed three-level article must stay derivable from the code."""
+    s = stack.build_stack(
+        backing=params.ROUND1_AS_PRINTED_BACKING_MM,
+        clearance=0.10,
+        depth=0.20,
+    )
+    assert [round(t, 9) for t in s.completed_tops] == [0.8, 1.6, 2.4]
