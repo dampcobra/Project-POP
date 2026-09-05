@@ -94,6 +94,97 @@ class FabricationResult:
         """The genuine voids left open in a region's body."""
         return self.body_for(region_id).footprint.void_holes
 
+    # -- registration freedom -------------------------------------------------
+
+    def seating_path(self, ancestor: str, descendant: str) -> tuple[str, ...]:
+        """The chain of regions seated one into the next, ancestor first.
+
+        Read off the derived bodies rather than the artwork: the path is built
+        from actual seating relationships, so each step is a body that hosts a
+        pocket for the next.
+
+            registration freedom is defined only along actual derived
+            seating relationships.
+
+            No seating relationship
+                -> no registration-freedom value under this model.
+
+        So a missing seating is not a zero. It raises, because the model has
+        nothing to say rather than something to say that happens to be zero.
+        Two siblings are the clearest example: they seat into the same parent,
+        never into each other, and the question has no answer.
+
+        This matters most for strategies that do not yet exist. An island insert
+        seats into no pocket, but that must not be read as "no play" -- its
+        location could be set by entirely different geometry, which has not been
+        designed. Raising keeps that question open; returning zero would answer
+        it wrongly and silently.
+
+        Raises `FabricationError` if no chain of seatings leads from `ancestor`
+        down to `descendant`.
+        """
+        for region_id in (ancestor, descendant):
+            if region_id not in self.bodies.region_ids():
+                raise FabricationError(f"no derived body for region {region_id!r}")
+
+        chain = [descendant]
+        seen = {descendant}
+        current = descendant
+        while current != ancestor:
+            parent = self._host_of(current)
+            if parent is None or parent in seen:
+                raise FabricationError(
+                    f"region {descendant!r} does not seat inside {ancestor!r}: "
+                    "registration freedom accumulates along a parent/child "
+                    "path, so it is only defined between an ancestor and a "
+                    "descendant. Two siblings do not seat into each other and "
+                    "contribute no play to one another."
+                )
+            seen.add(parent)
+            chain.append(parent)
+            current = parent
+        return tuple(reversed(chain))
+
+    def registration_freedom(self, ancestor: str, descendant: str) -> float:
+        """Worst-case play of `descendant` relative to `ancestor`, per side, in mm.
+
+            worst-case freedom  =  sum of the per-side seating clearances
+                                   along that ancestry path
+
+        Spike 02 measured this over two seatings and reported it as evidence.
+        The meaning is unchanged here, only generalised: every seating on the
+        path contributes its own per-side play, so error accumulates linearly
+        with relief depth however deep the artwork goes.
+
+        It is **ancestry-path accumulation, not stacking-level accumulation**.
+        Siblings sit at the same level and contribute nothing to each other.
+
+        Defined only where a seating path exists -- see `seating_path`. Where
+        none does, this raises rather than returning zero: the model has no
+        value to give, which is not the same as a value of zero.
+
+        A region relative to itself is the one degenerate case: the path is
+        real but has no seatings on it, so the freedom is genuinely 0.0.
+
+        Note: the per-seating clearance is read from the profile, which is
+        correct while every pocket is cut at the profile's clearance. Should a
+        strategy ever vary clearance per pocket, that value belongs on `Pocket`
+        and this should read it from there instead.
+        """
+        path = self.seating_path(ancestor, descendant)
+        # Every consecutive pair on a seating path is a seating by
+        # construction, so each contributes its per-side clearance. There is
+        # deliberately no "and zero otherwise" branch here: a step that is not
+        # a seating cannot be on the path at all.
+        return self.profile.per_side_clearance.mm * (len(path) - 1)
+
+    def _host_of(self, region_id: str) -> str | None:
+        """The body whose pocket seats this region, or None if nothing seats it."""
+        for body in self.bodies:
+            if body.hosts(region_id):
+                return body.region_id
+        return None
+
     def thin_support_findings(self) -> tuple[Finding, ...]:
         """Findings that are genuine defects rather than probe artefacts."""
         return tuple(f for f in self.findings if f.kind == "thin_derived_support")
