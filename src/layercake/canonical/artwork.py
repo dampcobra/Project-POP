@@ -24,12 +24,25 @@ Spike Glyph the backing now contains the foreground, which contains the island.
 That relationship is the raw material a stacking order is derived from
 (issue #7); this module exposes it and stops there.
 
-Gaps and overlaps
------------------
-Two regions claiming the same area is an error -- a point of the artwork cannot
-be two colours. A hole with no region in it is **not** an error: it is a void,
-legal artwork showing whatever is beneath, and it is reported rather than
-rejected (issue #8).
+Visible-surface semantics (ADR 0003)
+------------------------------------
+A region's area is **where that colour is seen**, not where its material is. The
+regions form a non-overlapping visible partition: every point of the artwork
+shows exactly one colour, so a parent is canonically *absent* wherever a visible
+child covers it.
+
+Two regions claiming the same area is an error at any nesting depth, not only
+between siblings. Hidden support beneath a visible region -- the solid backing
+under the foreground, the material under an island -- is a **fabrication**
+concern introduced downstream (#8, #9), never expressed as overlapping canonical
+artwork.
+
+A hole with no region in it is **not** an error: it is a void, legal artwork
+showing whatever is beneath, reported rather than rejected (#8).
+
+Colour here is an **opaque identity**. Layercake does not model colour
+contribution through translucency or underlying material; the visible result
+comes from the explicit surface colours themselves (ADR 0003 decision 6).
 """
 
 from __future__ import annotations
