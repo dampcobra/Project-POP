@@ -43,7 +43,14 @@ Exit code is 0 only if every pass criterion in Issue #1 holds.
 which holds the Spike 01 and Spike 02 experiments and their recorded evidence.
 **The product package never imports the spike** (asserted by test).
 
-First piece: `layercake.fabrication.FabricationProfile` — the fabrication
+`layercake.canonical.CanonicalArtwork` describes **what the artwork is** —
+coloured 2D regions and the containment between them, carrying no Z, thickness,
+clearance or backing. Regions form a non-overlapping *visible* partition: every
+point shows exactly one opaque colour, and hidden support beneath a region is a
+fabrication concern introduced downstream. The model is immutable by structure
+([ADR 0003](docs/adr/0003-canonical-artwork-visible-surface-semantics.md)).
+
+`layercake.fabrication.FabricationProfile` — the fabrication
 parameters, each carrying its own evidence level (`measured` / `held` /
 `engineering_choice`) and scope, so a report can state which numbers are backed
 by a physical result and which are not.
