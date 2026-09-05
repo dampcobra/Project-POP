@@ -37,6 +37,22 @@ Exit code is 0 only if every pass criterion in Issue #1 holds.
 | `validation-report.md` | Per-body manifold validation, with tool coverage limits |
 | `spike-summary.json` | Machine-readable pass/fail against Issue #1's criteria |
 
+## Spike 02 — Shallow registration recesses (layered relief)
+
+[Issue #3](https://github.com/dampcobra/Project-POP/issues/3). Replaces the
+construction Spike 01 physically rejected with **layered relief**: each colour
+body seats from above into a shallow registration recess in the colour below it.
+
+```bash
+.venv/Scripts/python.exe -m layercake_spike.spike02   # writes artefacts/spike02/
+```
+
+Produces a labelled FDM coupon testing three per-side clearances against two
+recess depths, plus concave and radiused-corner shape controls and a
+representative white → red → yellow three-level stack. See
+[`docs/spike-02/notes.md`](docs/spike-02/notes.md) and
+[ADR 0002](docs/adr/0002-layered-relief-registration-recesses.md).
+
 ### Documentation
 
 - [`docs/adr/`](docs/adr) — architecture decision records

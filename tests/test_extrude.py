@@ -6,6 +6,8 @@ property the whole spike turns on.
 
 import math
 
+import pytest
+
 import numpy as np
 import trimesh
 
@@ -71,3 +73,30 @@ def test_input_winding_is_normalised_so_callers_need_not_care():
     a = mesh_of(SQ2, [], 0.0, 1.0)
     b = mesh_of(list(reversed(SQ2)), [], 0.0, 1.0)
     assert math.isclose(a.volume, b.volume, rel_tol=1e-12)
+
+
+def test_two_holes_with_collinear_edges_are_refused_not_silently_broken():
+    """Found by Spike 02: a seven-segment "8" has exactly this shape.
+
+    Earcut is an ear-clipper, not a constrained triangulator. Where two holes in
+    one cap have collinear side edges it merges their boundary segments; the
+    triangulated area stays correct, so the fault is invisible to an area check,
+    but caps no longer share edges with the walls and the surface is open.
+    """
+    # the exact geometry that failed: a seven-segment "8" at 3.0 mm / 0.8 mm
+    outer = [
+        (0.8, 0.0), (1.86, 0.0), (1.86, 1.1), (1.86, 3.0),
+        (1.06, 3.0), (0.8, 3.0), (0.0, 3.0), (0.0, 1.9), (0.0, 0.0),
+    ]
+    upper = [(0.8, 1.9), (0.8, 2.2), (1.06, 2.2), (1.06, 1.9)]
+    lower = [(0.8, 0.8), (0.8, 1.1), (1.06, 1.1), (1.06, 0.8)]  # x edges line up
+    with pytest.raises(ValueError, match="non-manifold|collinear"):
+        extrude.extrude(outer, [upper, lower], 0.0, 0.6)
+
+
+def test_a_single_hole_is_unaffected():
+    outer = [(0.0, 0.0), (10.0, 0.0), (10.0, 20.0), (0.0, 20.0)]
+    hole = [(3.0, 2.0), (7.0, 2.0), (7.0, 8.0), (3.0, 8.0)]
+    v, f = extrude.extrude(outer, [hole], 0.0, 1.0)
+    m = trimesh.Trimesh(vertices=v, faces=f, process=False)
+    assert m.is_watertight and m.euler_number == 0

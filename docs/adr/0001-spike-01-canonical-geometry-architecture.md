@@ -6,6 +6,11 @@
 - **Session:** 0 — Product Definition & MVP
 - **Deciders:** Andy (Product Owner), Elara/ChatGPT (PM & Architect), Claude (Developer)
 - **Supersedes:** none
+- **Superseded in part by:** [ADR 0002](0002-layered-relief-registration-recesses.md)
+  — the "shallow registration recess" *direction* in decision 8 is replaced by a
+  specified layered-relief model. Decisions 1–7 stand unchanged, and decision 8's
+  rejection of full-depth zero-clearance insertion still holds. Nothing below has
+  been rewritten; see ADR 0002's "Relationship to ADR 0001" for the mapping.
 - **Related:** [Issue #1](https://github.com/dampcobra/Project-POP/issues/1) ·
   PR #2 · [`docs/spike-01/conclusion.md`](../spike-01/conclusion.md) ·
   [`docs/spike-01/geometry-spec.md`](../spike-01/geometry-spec.md)

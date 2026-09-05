@@ -10,4 +10,5 @@ when the evidence it is waiting on arrives.
 
 | # | Title | Status | Date |
 |---|---|---|---|
-| [0001](0001-spike-01-canonical-geometry-architecture.md) | Canonical geometry architecture following Spike 01 | Accepted — 1–7 confirmed by physical validation; 8 revised | 2026-09-04 |
+| [0001](0001-spike-01-canonical-geometry-architecture.md) | Canonical geometry architecture following Spike 01 | Accepted — 1–7 confirmed by physical validation; 8 revised, then partly superseded by 0002 | 2026-09-04 |
+| [0002](0002-layered-relief-registration-recesses.md) | Layered-relief construction and registration recesses | Accepted for the software model; parameters provisional pending Spike 02 physical validation | 2026-09-04 |
