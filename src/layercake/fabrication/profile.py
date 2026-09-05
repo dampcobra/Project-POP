@@ -59,6 +59,12 @@ class Provenance(Enum):
     reason for being where it is -- the process could not resolve finer --
     whereas an engineering choice has judgement only.
 
+    **That ordering is a narrow rule for deriving evidential parameters, not a
+    general confidence hierarchy** (agreed Session 01). It answers one question:
+    which provenance a value inherits when it is computed from others. It is not
+    a claim that a held value is always more trustworthy than an engineering
+    choice in some broader sense, and it should not be reused as one.
+
     `PRODUCT_INTENT` is **not evidential**. It records a decision about what
     Layercake should look like, not a claim about the world, so asking whether
     it is stronger or weaker than a measurement is a category error rather than
@@ -78,7 +84,11 @@ class Provenance(Enum):
 
     @property
     def rank(self) -> int:
-        """Position on the evidence scale. Non-evidential categories have none."""
+        """Position on the evidence scale. Non-evidential categories have none.
+
+        Used only to decide which provenance a derived value inherits. Not a
+        general confidence score.
+        """
         if not self.is_evidential:
             raise ProvenanceError(
                 f"{self.value} is not evidence, so it has no rank. It records a "
