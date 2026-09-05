@@ -37,6 +37,23 @@ Exit code is 0 only if every pass criterion in Issue #1 holds.
 | `validation-report.md` | Per-body manifold validation, with tool coverage limits |
 | `spike-summary.json` | Machine-readable pass/fail against Issue #1's criteria |
 
+## Product model
+
+`src/layercake/` holds the product model, distinct from `src/layercake_spike/`,
+which holds the Spike 01 and Spike 02 experiments and their recorded evidence.
+**The product package never imports the spike** (asserted by test).
+
+First piece: `layercake.fabrication.FabricationProfile` — the fabrication
+parameters, each carrying its own evidence level (`measured` / `held` /
+`engineering_choice`) and scope, so a report can state which numbers are backed
+by a physical result and which are not.
+
+```python
+from layercake.fabrication import FabricationProfile
+
+print(FabricationProfile.default().validate().to_markdown())
+```
+
 ## Spike 02 — Shallow registration recesses (layered relief)
 
 [Issue #3](https://github.com/dampcobra/Project-POP/issues/3). Replaces the
