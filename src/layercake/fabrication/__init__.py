@@ -1,5 +1,17 @@
 """Fabrication: turning canonical artwork into manufacturable bodies."""
 
-from .profile import Evidence, FabricationProfile, Parameter, ProfileError
+from .profile import (
+    FabricationProfile,
+    Parameter,
+    ProfileError,
+    Provenance,
+    ProvenanceError,
+)
 
-__all__ = ["Evidence", "FabricationProfile", "Parameter", "ProfileError"]
+__all__ = [
+    "FabricationProfile",
+    "Parameter",
+    "ProfileError",
+    "Provenance",
+    "ProvenanceError",
+]

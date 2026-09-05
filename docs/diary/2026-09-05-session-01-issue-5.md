@@ -14,7 +14,7 @@ is an AST-walking test that asserts it rather than trusting discipline.
 
 ## The two things that made this worth its own ticket
 
-**Evidence became data.** Session 01 established that these values are not
+**Provenance became data.** Session 01 established that these values are not
 equally trustworthy: seating depth is *measured*, clearance is *held* because
 neither Spike 02 round could resolve it, the minimum recess floor is an untested
 *engineering choice*, and backing thickness derives from the last two. That
@@ -68,4 +68,4 @@ not re-decide them.
 
 ## Result
 
-202 tests pass, 20 of them new. Both spike pipelines unchanged and still PASS.
+210 tests pass, 28 of them new. Both spike pipelines unchanged and still PASS.

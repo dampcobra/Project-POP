@@ -1,4 +1,4 @@
-"""Fabrication parameters, with each value's evidential weight carried as data.
+"""Fabrication parameters, with each value's provenance carried as data.
 
 Layercake's fabrication parameters are not equally trustworthy. Spike 02
 *measured* the seating depth. It *held* the XY clearance at the process floor
@@ -9,6 +9,15 @@ thickness is derived from the last two and can be no stronger than the weaker.
 Until now that distinction lived in docstrings, maintained by a test that
 grepped them. Here it is structured data, so a report can state which numbers
 are measured without a human remembering to.
+
+Not every provenance is evidence
+--------------------------------
+Visible step height is a *product specification* -- a decision about what
+Layercake should look like -- not a claim about the world. It is recorded as
+`PRODUCT_INTENT` and deliberately left off the evidence ranking: asking whether
+a design decision is weaker than a measurement is a category error, and giving
+it an artificial position purely to fit the derivation mechanism would bury that.
+Derived physical parameters therefore accept evidential inputs only.
 
 Numerically equal is not semantically equal
 -------------------------------------------
@@ -35,33 +44,79 @@ class ProfileError(ValueError):
     """A fabrication profile that cannot be manufactured as specified."""
 
 
-class Evidence(Enum):
-    """How well a parameter's value is supported.
+class ProvenanceError(ValueError):
+    """A provenance category used in a way its kind does not support."""
 
-    Ordered weakest to strongest. `HELD` sits above `ENGINEERING_CHOICE` because
-    a held value has an empirical reason for being where it is -- the process
-    could not resolve finer -- whereas an engineering choice has judgement only.
-    Both are below `MEASURED`. The ranking is only consulted when deriving a
-    parameter from others, and is worth a second opinion.
+
+class Provenance(Enum):
+    """Where a parameter's value comes from.
+
+    Two kinds of category live here, and they are **not** points on one scale.
+
+    *Evidential* categories make a claim about physical reality, and can be
+    ranked weakest to strongest: `ENGINEERING_CHOICE` < `HELD` < `MEASURED`.
+    `HELD` sits above `ENGINEERING_CHOICE` because a held value has an empirical
+    reason for being where it is -- the process could not resolve finer --
+    whereas an engineering choice has judgement only.
+
+    `PRODUCT_INTENT` is **not evidential**. It records a decision about what
+    Layercake should look like, not a claim about the world, so asking whether
+    it is stronger or weaker than a measurement is a category error rather than
+    a question with an answer. It is deliberately excluded from the ordering
+    instead of being given an artificial position to fit the mechanism.
     """
 
+    PRODUCT_INTENT = "product_intent"
     ENGINEERING_CHOICE = "engineering_choice"
     HELD = "held"
     MEASURED = "measured"
 
     @property
+    def is_evidential(self) -> bool:
+        """Whether this category makes a claim about physical reality."""
+        return self in _EVIDENCE_ORDER
+
+    @property
     def rank(self) -> int:
+        """Position on the evidence scale. Non-evidential categories have none."""
+        if not self.is_evidential:
+            raise ProvenanceError(
+                f"{self.value} is not evidence, so it has no rank. It records a "
+                "product decision rather than a claim about physical reality, "
+                "and is not weaker or stronger than a measurement -- it is a "
+                "different kind of statement."
+            )
         return _EVIDENCE_ORDER.index(self)
 
     @staticmethod
-    def weakest(*levels: "Evidence") -> "Evidence":
-        """The weakest of several levels: a derived value inherits this."""
+    def weakest(*levels: "Provenance") -> "Provenance":
+        """The weakest of several evidential categories.
+
+        A parameter derived from others inherits this. Every input must be
+        evidential: there is no meaningful answer to "is a product decision
+        weaker than a measurement", so a derivation involving one has to state
+        its own provenance explicitly rather than compute it.
+        """
         if not levels:
-            raise ValueError("weakest() needs at least one evidence level")
+            raise ProvenanceError("weakest() needs at least one provenance")
+        non_evidential = [q.value for q in levels if not q.is_evidential]
+        if non_evidential:
+            raise ProvenanceError(
+                f"cannot rank {', '.join(sorted(set(non_evidential)))} against "
+                "evidence. A derived value whose inputs include a product "
+                "decision must decide its own provenance explicitly rather than "
+                "inherit one."
+            )
         return min(levels, key=lambda e: e.rank)
 
 
-_EVIDENCE_ORDER = [Evidence.ENGINEERING_CHOICE, Evidence.HELD, Evidence.MEASURED]
+#: The evidential categories, weakest first. `PRODUCT_INTENT` is absent by
+#: design -- membership of this list is what makes a category rankable.
+_EVIDENCE_ORDER = [
+    Provenance.ENGINEERING_CHOICE,
+    Provenance.HELD,
+    Provenance.MEASURED,
+]
 
 
 @dataclass(frozen=True)
@@ -74,11 +129,20 @@ class Parameter:
 
     name: str
     value: float | str
-    evidence: Evidence
+    provenance: Provenance
     scope: str
     unit: str | None = "mm"
     is_z_dimension: bool = False
     derived_from: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.derived_from and not self.provenance.is_evidential:
+            raise ProvenanceError(
+                f"{self.name} is derived from {', '.join(self.derived_from)}, so "
+                f"its provenance must be evidential; {self.provenance.value} is "
+                "not. Derivation inherits the weakest evidence of its inputs, "
+                "and a product decision does not sit on that scale."
+            )
 
     @property
     def mm(self) -> float:
@@ -91,7 +155,8 @@ class Parameter:
         d: dict = {
             "value": self.value,
             "unit": self.unit,
-            "evidence": self.evidence.value,
+            "provenance": self.provenance.value,
+            "is_evidential": self.provenance.is_evidential,
             "scope": self.scope,
             "is_z_dimension": self.is_z_dimension,
         }
@@ -130,9 +195,12 @@ _SCOPE_BACKING = (
 )
 
 _SCOPE_H = (
-    "Product intent, not a measurement: how far one completed colour level "
-    "stands above the one below. Currently equal to the seating depth by "
-    "coincidence, not by relationship."
+    "PRODUCT SPECIFICATION, not evidence. How far one completed colour level "
+    "stands above the one below: a decision about what Layercake should look "
+    "like, so no physical claim is being made about it and it carries no "
+    "evidence rank. Distinct from the 0.40 mm floor, which IS an evidential "
+    "claim that simply has not been tested. Currently equal to the seating "
+    "depth by coincidence, not by relationship."
 )
 
 _SCOPE_LAYER = (
@@ -178,36 +246,36 @@ class FabricationProfile:
     def default(cls) -> "FabricationProfile":
         """The Session 01 defaults, with their provenance."""
         depth = Parameter(
-            "seating_depth", 0.80, Evidence.MEASURED, _SCOPE_MEASURED_DEPTH,
+            "seating_depth", 0.80, Provenance.MEASURED, _SCOPE_MEASURED_DEPTH,
             is_z_dimension=True,
         )
         floor = Parameter(
-            "minimum_recess_floor", 0.40, Evidence.ENGINEERING_CHOICE, _SCOPE_FLOOR,
+            "minimum_recess_floor", 0.40, Provenance.ENGINEERING_CHOICE, _SCOPE_FLOOR,
             is_z_dimension=True,
         )
         return cls(
             visible_step_height=Parameter(
-                "visible_step_height", 0.8, Evidence.ENGINEERING_CHOICE, _SCOPE_H,
+                "visible_step_height", 0.8, Provenance.PRODUCT_INTENT, _SCOPE_H,
                 is_z_dimension=True,
             ),
             seating_depth=depth,
             per_side_clearance=Parameter(
-                "per_side_clearance", 0.05, Evidence.HELD, _SCOPE_HELD_CLEARANCE,
+                "per_side_clearance", 0.05, Provenance.HELD, _SCOPE_HELD_CLEARANCE,
             ),
             minimum_recess_floor=floor,
             backing_thickness=Parameter(
                 "backing_thickness",
                 1.2,
-                Evidence.weakest(depth.evidence, floor.evidence),
+                Provenance.weakest(depth.provenance, floor.provenance),
                 _SCOPE_BACKING,
                 is_z_dimension=True,
                 derived_from=("seating_depth", "minimum_recess_floor"),
             ),
             layer_height=Parameter(
-                "layer_height", 0.20, Evidence.HELD, _SCOPE_LAYER,
+                "layer_height", 0.20, Provenance.HELD, _SCOPE_LAYER,
             ),
             offset_join=Parameter(
-                "offset_join", "round", Evidence.ENGINEERING_CHOICE, _SCOPE_JOIN,
+                "offset_join", "round", Provenance.ENGINEERING_CHOICE, _SCOPE_JOIN,
                 unit=None,
             ),
         )
@@ -291,11 +359,15 @@ class FabricationProfile:
         return {
             "profile": "layercake fabrication profile",
             "required_backing_mm": self.required_backing_mm,
-            "evidence_note": (
-                "Values do not carry equal weight. 'measured' is backed by a "
-                "physical result; 'held' is fixed deliberately because it could "
-                "not be resolved; 'engineering_choice' has never been tested. A "
-                "derived value inherits the weakest evidence of its inputs."
+            "provenance_note": (
+                "Values do not all make the same kind of claim. 'measured' is "
+                "backed by a physical result; 'held' is fixed deliberately "
+                "because it could not be resolved; 'engineering_choice' has "
+                "never been tested. Those three are evidential and can be "
+                "ranked. 'product_intent' is not evidence at all -- it records a "
+                "decision about what Layercake should look like -- so it is "
+                "excluded from the ranking rather than placed on it. A derived "
+                "value inherits the weakest evidence of its inputs."
             ),
             "parameters": {q.name: q.to_dict() for q in self.parameters()},
         }
@@ -304,27 +376,32 @@ class FabricationProfile:
         lines = [
             "# Fabrication profile",
             "",
-            "| Parameter | Value | Evidence | Derived from |",
+            "| Parameter | Value | Provenance | Derived from |",
             "|---|---|---|---|",
         ]
         for q in self.parameters():
             value = f"{q.mm:.2f} mm" if q.unit == "mm" else f"`{q.value}`"
             derived = ", ".join(q.derived_from) if q.derived_from else "-"
             lines.append(
-                f"| {_human(q.name)} | {value} | `{q.evidence.value}` | {derived} |"
+                f"| {_human(q.name)} | {value} | `{q.provenance.value}` | {derived} |"
             )
         lines += [
             "",
-            "**Values do not carry equal weight.** `measured` is backed by a "
-            "physical result; `held` is fixed deliberately because it could not be "
-            "resolved; `engineering_choice` has never been tested. A derived value "
-            "inherits the weakest evidence of its inputs.",
+            "**Values do not all make the same kind of claim.** `measured` is "
+            "backed by a physical result; `held` is fixed deliberately because it "
+            "could not be resolved; `engineering_choice` has never been tested. "
+            "Those three are evidential and can be ranked, and a derived value "
+            "inherits the weakest of its inputs.",
+            "",
+            "`product_intent` is **not evidence**: it records a decision about "
+            "what Layercake should look like, not a claim about physical reality. "
+            "It is excluded from the ranking rather than placed on it.",
             "",
             "## Scope of each value",
             "",
         ]
         for q in self.parameters():
-            lines.append(f"- **{_human(q.name)}** (`{q.evidence.value}`): {q.scope}")
+            lines.append(f"- **{_human(q.name)}** (`{q.provenance.value}`): {q.scope}")
         return "\n".join(lines) + "\n"
 
 
