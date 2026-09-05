@@ -139,3 +139,29 @@ stacked levels stay practical for a four-colour artwork.
 ---
 
 Round 2 (depth sweep) continues in [round-2-depth-sweep.md](round-2-depth-sweep.md).
+
+---
+
+## Bambu Studio reference project
+
+`artefacts/spike02/project_pop_spike_2.3mf` is the **Spike 02 Bambu Studio
+reference project**. It is committed deliberately, alongside the generated STLs,
+so the slicer-side setup lives with the geometry it slices rather than only on
+Andy's machine.
+
+It carries 27 objects, named from the STLs this pipeline generates -- the round-1
+coupon fixture and its children, the three-level `stack_white` / `stack_red` /
+`stack_yellow` bodies, and round-2 depth-sweep children such as
+`depth_child_d040_r1`. Printed in PLA through a 0.4 mm nozzle.
+
+**This does not make Layercake slicer-dependent.** ADR 0001 decision 7 and
+ADR 0002 hold that separate STL bodies are the export model and that Bambu
+Studio is Andy's validation slicer, not an architectural dependency. Nothing in
+`src/` reads or writes 3MF. The file is *recorded evidence of how the validation
+prints were produced* -- the plate arrangement and settings behind the physical
+results in these notes -- which matters because Spike 02's process conditions
+(0.20 mm layer height, 0.15 mm elephant-foot compensation) are experimental
+conditions rather than incidental detail.
+
+Regenerating the STLs does not update it; it is a snapshot Andy saves from
+Bambu Studio.
