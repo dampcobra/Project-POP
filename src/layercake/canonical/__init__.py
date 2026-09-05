@@ -9,7 +9,6 @@ from .artwork import (
     Region,
     RegionSpec,
 )
-
 __all__ = [
     "ArtworkError",
     "ArtworkValidation",
