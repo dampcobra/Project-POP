@@ -5,9 +5,18 @@ vertical arrangement: a region nested one level deeper sits one level higher. So
 stacking order is **derived**, never authored -- there is no layer index to keep
 in step with the geometry, and no second place for the truth to live.
 
-Lives under `canonical` because it is a statement about canonical topology
-alone. No fabrication input reaches it: no thickness, no seating depth, no
-profile. Turning a level into a Z position is fabrication's job (#9).
+Sits between canonical artwork and fabrication::
+
+    canonical artwork  ->  stacking derivation  ->  fabrication
+
+Deliberately *not* inside `canonical`. Canonical artwork is strictly the visible
+2D surface and its topology, whereas this module talks about bottom, higher and
+physical level -- vertical concepts, correctly derived from containment but not
+part of describing what the artwork looks like.
+
+Equally not inside `fabrication`: no thickness, seating depth or profile reaches
+it. Turning a level index into a Z position is fabrication's job (#9); this
+module stops at the ordering.
 
 Siblings are peers
 ------------------
@@ -29,7 +38,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:  # pragma: no cover
-    from .artwork import CanonicalArtwork
+    from .canonical.artwork import CanonicalArtwork
 
 _PEER_ORDER_NOTE = (
     "Regions within a level are peers at the same physical height. Their order "
@@ -39,7 +48,12 @@ _PEER_ORDER_NOTE = (
 
 
 class StackingError(ValueError):
-    """Containment from which no stacking order can be derived."""
+    """A stacking order that cannot be derived, or does not hold together.
+
+    Raised both when containment admits no ordering -- a cycle -- and when a
+    `StackingOrder` or `StackingLevel` is constructed in a state that
+    contradicts what the type claims about itself.
+    """
 
 
 @dataclass(frozen=True)
@@ -50,10 +64,47 @@ class StackingLevel:
     one level higher. `peers` are the regions at that height -- co-located
     vertically, ordered by id for reproducibility rather than by any property of
     the artwork.
+
+    The type enforces what it claims: a level is a real height (non-negative), it
+    holds at least one region, no region appears in it twice, and the peers are
+    in the id order the docstring promises. Derived orders satisfy all of this
+    naturally; the checks are here so a hand-built one cannot quietly claim
+    otherwise.
     """
 
     index: int
     peers: tuple[str, ...]
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.index, int) or isinstance(self.index, bool):
+            raise StackingError(f"level index must be an int, got {self.index!r}")
+        if self.index < 0:
+            raise StackingError(
+                f"level index must be non-negative, got {self.index}: 0 is the "
+                "bottom of the stack"
+            )
+        if not isinstance(self.peers, tuple):
+            raise StackingError(
+                f"level {self.index} peers must be a tuple, got "
+                f"{type(self.peers).__name__} -- a mutable sequence would let the "
+                "level change after construction"
+            )
+        if not self.peers:
+            raise StackingError(
+                f"level {self.index} has no regions; an empty level is a gap in "
+                "the stack, not a level"
+            )
+        duplicates = sorted({p for p in self.peers if self.peers.count(p) > 1})
+        if duplicates:
+            raise StackingError(
+                f"level {self.index} lists {', '.join(duplicates)} more than once"
+            )
+        if list(self.peers) != sorted(self.peers):
+            raise StackingError(
+                f"level {self.index} peers must be in region-id order, got "
+                f"{self.peers}. The order carries no physical meaning, but it is "
+                "what makes output reproducible."
+            )
 
     def to_dict(self) -> dict:
         return {"index": self.index, "peers": list(self.peers)}
@@ -66,9 +117,43 @@ class StackingOrder:
     Levels are ordered bottom-up, so `levels[0]` is the bottom. Position in the
     tuple and `StackingLevel.index` agree, but the index is stated explicitly
     rather than left implicit in a list position.
+
+    Because the index is stated *and* implied, the two could disagree -- so the
+    type checks they do not. It also checks that levels run contiguously from 0,
+    with no gap, and that no region appears at two different heights, which would
+    make "the level of this region" a question with two answers.
     """
 
     levels: tuple[StackingLevel, ...]
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.levels, tuple):
+            raise StackingError(
+                f"levels must be a tuple, got {type(self.levels).__name__}"
+            )
+
+        for position, level in enumerate(self.levels):
+            if not isinstance(level, StackingLevel):
+                raise StackingError(
+                    f"levels[{position}] is a {type(level).__name__}, "
+                    "not a StackingLevel"
+                )
+            if level.index != position:
+                raise StackingError(
+                    f"levels[{position}] claims index {level.index}. Level "
+                    "indices must run contiguously from 0 and match their "
+                    "position, or the stated height and the implied one disagree."
+                )
+
+        seen: dict[str, int] = {}
+        for level in self.levels:
+            for region_id in level.peers:
+                if region_id in seen:
+                    raise StackingError(
+                        f"{region_id!r} appears at level {seen[region_id]} and "
+                        f"level {level.index}: a region sits at one height"
+                    )
+                seen[region_id] = level.index
 
     def __len__(self) -> int:
         return len(self.levels)

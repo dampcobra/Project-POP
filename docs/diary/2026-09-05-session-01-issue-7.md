@@ -5,7 +5,7 @@
 
 ## What this is
 
-`layercake.canonical.stacking` — `derive_stacking_order(artwork) -> StackingOrder`.
+`layercake.stacking` — `derive_stacking_order(artwork) -> StackingOrder`.
 
 Containment already contains the vertical arrangement, so stacking order is
 derived rather than authored. Nothing is written back into `CanonicalArtwork`,
@@ -70,12 +70,48 @@ dictionary iteration order, not area or any other geometric value. Tests pin
 each of those: a larger sibling with a later-sorting id must still come second,
 and artwork authored in a different order must derive identically.
 
-**Placed under `canonical/`.** It is a statement about canonical topology alone —
-no thickness, no seating depth, no profile reaches it. Turning a level index into
-a Z position is #9's job. A guard test asserts no fabrication vocabulary appears
-in the module.
+**Placed between canonical and fabrication**, as its own module rather than
+inside either — see the review round below.
+
+## Review round
+
+Two changes from Andy and Elara, both sharpening what was already there.
+
+**Stacking moved out of `canonical`.** I had put it under `canonical/` on the
+grounds that it derives from canonical topology and nothing else. Fair, but it
+misses that `StackingOrder` talks about *bottom*, *higher* and *physical level* —
+vertical concepts. Canonical artwork is strictly the visible 2D surface, so
+those do not belong in the same package however they are computed.
+
+It now sits between the two:
+
+    canonical artwork  ->  stacking derivation  ->  fabrication
+
+Not inside `fabrication` either: no thickness, seating depth or profile reaches
+it. Two AST guards hold the arrow in place — canonical must not import stacking,
+and stacking must not import fabrication.
+
+**The exported structures now enforce their own invariants.** The types claimed
+things they did not check, which is the same gap we closed on `CanonicalArtwork`.
+`__post_init__` on each now refuses:
+
+- a negative level index;
+- an empty level, which is a gap rather than a level;
+- a region listed twice within one level;
+- peers out of region-id order — the order carries no physical meaning, but it
+  is what makes output reproducible, so a hand-built level should not claim it
+  falsely;
+- peers given as a mutable list;
+- a level index disagreeing with its position, or indices not contiguous from 0;
+- a region appearing at two heights, which would make "the level of this region"
+  a question with two answers.
+
+An empty artwork still derives an empty order — no regions is not an
+inconsistent state, just nothing to stack. And a derived order can be
+reconstructed from its own parts without raising, which is the check that the
+invariants match what the derivation actually produces.
 
 ## Result
 
-274 tests pass, 23 of them new. Both spike pipelines unchanged and still PASS.
+288 tests pass, 37 of them new. Both spike pipelines unchanged and still PASS.
 Nothing from #8 or #9 pulled forward.

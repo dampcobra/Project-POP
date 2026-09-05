@@ -10,13 +10,15 @@ are ordered within that level only so output is reproducible, and that ordering
 carries no physical meaning at all.
 """
 
+import ast
 import dataclasses
 import json
+from pathlib import Path
 
 import pytest
 
 from layercake.canonical import artwork as ca
-from layercake.canonical import stacking as st
+from layercake import stacking as st
 from layercake_spike import spec
 
 SQ = [(0.0, 0.0), (10.0, 0.0), (10.0, 10.0), (0.0, 10.0)]
@@ -293,3 +295,120 @@ def test_stacking_carries_no_fabrication_concerns():
     for name in names:
         for word in _FABRICATION_WORDS:
             assert word not in name.lower(), name
+
+
+# --- the layering: canonical -> stacking -> fabrication ----------------------
+
+
+def test_stacking_is_not_part_of_the_canonical_package():
+    """Canonical is the visible 2D artwork. Stacking talks about height."""
+    from layercake import canonical
+
+    for name in ("StackingOrder", "StackingLevel", "derive_stacking_order"):
+        assert not hasattr(canonical, name), name
+    assert not (Path(ca.__file__).parent / "stacking.py").exists()
+
+
+def test_canonical_does_not_import_stacking():
+    """The arrow points one way: canonical -> stacking -> fabrication."""
+    root = Path(ca.__file__).parent
+    offenders: set[str] = set()
+    for path in root.rglob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                offenders |= {a.name for a in node.names if "stacking" in a.name}
+            elif isinstance(node, ast.ImportFrom) and node.module:
+                if "stacking" in node.module:
+                    offenders.add(node.module)
+    assert offenders == set(), offenders
+
+
+def test_stacking_does_not_import_fabrication():
+    """It stops at the ordering; turning a level into Z is #9's job."""
+    tree = ast.parse(Path(st.__file__).read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom) and node.module:
+            assert "fabrication" not in node.module, node.module
+        elif isinstance(node, ast.Import):
+            for alias in node.names:
+                assert "fabrication" not in alias.name, alias.name
+
+
+# --- the exported structures enforce what they claim -------------------------
+
+
+def test_a_level_index_must_be_a_real_height():
+    with pytest.raises(st.StackingError, match="non-negative"):
+        st.StackingLevel(index=-1, peers=("a",))
+
+
+def test_a_level_must_hold_at_least_one_region():
+    with pytest.raises(st.StackingError, match="empty level|no regions"):
+        st.StackingLevel(index=0, peers=())
+
+
+def test_a_region_cannot_appear_twice_in_one_level():
+    with pytest.raises(st.StackingError, match="more than once"):
+        st.StackingLevel(index=0, peers=("a", "b", "a"))
+
+
+def test_level_peers_must_be_in_region_id_order():
+    with pytest.raises(st.StackingError, match="region-id order"):
+        st.StackingLevel(index=0, peers=("b", "a"))
+
+
+def test_level_peers_must_be_an_immutable_tuple():
+    with pytest.raises(st.StackingError, match="tuple"):
+        st.StackingLevel(index=0, peers=["a"])  # type: ignore[arg-type]
+
+
+def test_a_level_index_must_match_its_position():
+    with pytest.raises(st.StackingError, match="claims index"):
+        st.StackingOrder(
+            levels=(
+                st.StackingLevel(index=0, peers=("a",)),
+                st.StackingLevel(index=5, peers=("b",)),
+            )
+        )
+
+
+def test_level_indices_must_be_contiguous_from_zero():
+    with pytest.raises(st.StackingError, match="claims index"):
+        st.StackingOrder(levels=(st.StackingLevel(index=1, peers=("a",)),))
+
+
+def test_a_region_cannot_sit_at_two_heights():
+    with pytest.raises(st.StackingError, match="appears at level"):
+        st.StackingOrder(
+            levels=(
+                st.StackingLevel(index=0, peers=("a", "b")),
+                st.StackingLevel(index=1, peers=("b",)),
+            )
+        )
+
+
+def test_a_well_formed_order_constructs_fine():
+    order = st.StackingOrder(
+        levels=(
+            st.StackingLevel(index=0, peers=("a", "b")),
+            st.StackingLevel(index=1, peers=("c",)),
+        )
+    )
+    assert order.level_of("c") == 1
+    assert order.peers_of("a") == ("a", "b")
+
+
+def test_an_empty_artwork_derives_an_empty_order():
+    """No regions is not an inconsistent state; it is simply nothing to stack."""
+    empty = ca.CanonicalArtwork.from_specs([])
+    order = st.derive_stacking_order(empty)
+    assert len(order) == 0
+    assert order.region_ids() == ()
+
+
+def test_every_derived_order_satisfies_the_invariants_naturally():
+    for artwork in (spike_glyph(), siblings_artwork()):
+        order = st.derive_stacking_order(artwork)
+        # reconstructing from its own parts must not raise
+        st.StackingOrder(levels=order.levels)
