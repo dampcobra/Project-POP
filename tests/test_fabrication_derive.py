@@ -549,9 +549,13 @@ def test_a_hairline_sliver_along_a_sloped_edge_is_not_called_thin_support():
 def test_every_body_is_extrudable_as_a_closed_solid():
     """Checked as preconditions on the footprint, not by building a mesh.
 
-    See the PR: the proven mesh machinery lives in the spike, which the product
-    package is forbidden to import, so criterion 9 cannot be met as written. What
-    is asserted here is everything an extrusion needs to be true before it runs.
+    The proven mesh machinery lives in the spike, which the product package is
+    forbidden to import, and the product has no mesh code of its own. Rather than
+    duplicate an extruder to satisfy a criterion that exists to prevent exactly
+    that duplication, #9's acceptance was amended to require these preconditions
+    -- everything an extrusion needs to be true before it runs -- and mesh
+    manifoldness was deferred to issue #19, along with the decision on whether to
+    promote the Spike 02 extruder into the product rather than rewrite it.
     """
     result = derive(four_deep(), FabricationProfile.default())
 

@@ -47,8 +47,25 @@ What I did instead: `test_every_body_is_extrudable_as_a_closed_solid` asserts
 every **precondition** a manifold extrusion needs — positive thickness, a
 non-degenerate outer ring, no repeated vertices, each pocket strictly inside the
 body, shallower than the body, disjoint from every other pocket, and not
-overlapping any void. Meshing itself, and the manifold assertion over it, wants
-its own ticket where the extruder can be reviewed as the substantial thing it is.
+overlapping any void.
+
+### Resolution (Andy and Elara, on reviewing PR #18)
+
+Agreed, and settled rather than left open. **No mesh code goes into PR #18.**
+
+- **#9's acceptance criterion was amended** to require the geometric and
+  extrusion preconditions above, stating explicitly that mesh manifoldness is
+  deferred because product meshing does not yet exist.
+- **Issue #19** now tracks product-side meshing and validating every derived body
+  as manifold. It is written to make the promote-versus-rewrite question the
+  first decision in the ticket: whether the Spike 02 extruder and validator
+  should be moved into the product package rather than independently rewritten,
+  with the physical proof and the hard-won correctness they carry — the `earcut`
+  collinear-boundary bug, hole winding normalisation, the project-written
+  self-intersection test — weighed against their spike-shaped API.
+
+The deferral is therefore traceable from three places: the amended criterion in
+#9, the reference in #19, and the docstring of the test that stands in for it.
 
 ## The bug the tests found
 
