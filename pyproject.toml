@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "layercake-spike"
 version = "0.1.0"
-description = "Spike 01: canonical topology and manifold STL export for Layercake (Project POP)"
+description = "Layercake (Project POP): product model plus the Spike 01 and Spike 02 experiments"
 requires-python = ">=3.11"
 dependencies = [
     "pyclipr>=0.1.8",
