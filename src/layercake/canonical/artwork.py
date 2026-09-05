@@ -334,10 +334,25 @@ class CanonicalArtwork:
         return tuple(sorted(r for r, p in self._parents.items() if p is None))
 
     def ancestors_of(self, region_id: str) -> tuple[str, ...]:
-        """Enclosing regions, innermost first."""
+        """Enclosing regions, innermost first.
+
+        Raises `ArtworkError` on a containment cycle rather than walking forever.
+        Two regions with identical footprints enclose each other, which makes
+        each the other's parent -- reachable through `from_specs`, and reported
+        by `validate()` as overlapping. Found while building issue #7.
+        """
         out: list[str] = []
+        seen = {region_id}
         current = self._parents[region_id]
         while current is not None:
+            if current in seen:
+                raise ArtworkError(
+                    f"containment cycle reached from {region_id!r} at "
+                    f"{current!r}: regions enclose each other, so none is "
+                    "outermost. This artwork is not a visible partition; "
+                    "validate() reports the overlap that causes it."
+                )
+            seen.add(current)
             out.append(current)
             current = self._parents[current]
         return tuple(out)

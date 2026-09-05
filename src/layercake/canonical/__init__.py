@@ -9,6 +9,12 @@ from .artwork import (
     Region,
     RegionSpec,
 )
+from .stacking import (
+    StackingError,
+    StackingLevel,
+    StackingOrder,
+    derive_stacking_order,
+)
 
 __all__ = [
     "ArtworkError",
@@ -18,4 +24,8 @@ __all__ = [
     "Edge",
     "Region",
     "RegionSpec",
+    "StackingError",
+    "StackingLevel",
+    "StackingOrder",
+    "derive_stacking_order",
 ]
