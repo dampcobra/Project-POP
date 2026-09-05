@@ -96,7 +96,43 @@ bare `"depth"`. A false positive, but a useful one: it proved the guard was
 actually looking. Narrowed to `seating_depth` / `recess_depth`, with a comment
 saying why a bare `depth` is wrong.
 
+## Review round: hardening
+
+Two fair catches from Andy and Elara.
+
+**`frozen=True` was doing less than it looked.** It prevented rebinding the
+attributes but not reaching *through* them: `regions` and `_parents` were plain
+dicts, and the published `VertexTable` still carried `add()` and `intern()`. A
+downstream caller could have mutated canonical state despite the model
+advertising itself as frozen -- which is exactly the "immutable by convention"
+the acceptance criterion was trying to rule out.
+
+Now immutable by structure:
+
+- `regions` and `_parents` are published as `MappingProxyType`;
+- interning moved to a private, short-lived `_VertexInterner` that is never
+  published; the artwork holds an immutable `VertexTable` with tuple coords and
+  no way to add to it;
+- `_compute_parents` moved to module level so the instance is built once,
+  complete, instead of being patched with `object.__setattr__` after
+  construction -- the patching was itself a small admission that the model was
+  not really frozen.
+
+Nine tests now attempt mutation deliberately and prove each route closed.
+
+One consequence worth noting: `MappingProxyType` cannot be deep-copied, so the
+"not mutated by inspection" test now compares against a second independently
+built artwork rather than a `deepcopy`. That is a better test anyway -- it
+compares two things built the same way rather than an object against a clone of
+itself.
+
+**Material terminology removed from the canonical API.** `solid_rings()` and
+`solid_area()` described "a region's material", which contradicts ADR 0003
+decisions 4 and 6 in the very API that implements them. Renamed to
+`region_rings()` and `region_area()`, and `"solid"` and `"material"` are now in
+the fabrication-word guard so the vocabulary cannot come back.
+
 ## Result
 
-242 tests pass, 32 of them new. Both spike pipelines unchanged and still PASS.
+251 tests pass, 41 of them new. Both spike pipelines unchanged and still PASS.
 Nothing from #7 pulled forward.

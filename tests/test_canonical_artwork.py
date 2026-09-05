@@ -51,6 +51,8 @@ def spike_glyph() -> ca.CanonicalArtwork:
 _FABRICATION_WORDS = (
     "z_", "_z", "thickness", "clearance", "seating", "seating_depth",
     "recess", "recess_depth", "backing", "layer_height", "floor", "pocket",
+    # canonical regions are visible coloured surface, not fabrication material
+    "solid", "material",
 )
 
 
@@ -266,14 +268,16 @@ def test_several_regions_may_share_one_colour():
 
 
 def test_artwork_is_not_mutated_by_inspection():
+    # a second, independently built artwork is the reference: the published
+    # model holds mappingproxies, which deliberately cannot be deep-copied
     art = spike_glyph()
-    before = copy.deepcopy(art)
+    reference = spike_glyph()
     art.shared_edges()
     art.adjacency()
     art.containment_depth("C")
     art.validate()
     art.to_dump()
-    assert art == before
+    assert art == reference
 
 
 def test_regions_are_frozen():
@@ -301,7 +305,7 @@ def test_a_clean_artwork_validates_with_no_overlap():
 def test_the_visible_partition_tiles_the_artwork_exactly():
     """ADR 0003: every point of the artwork shows exactly one colour."""
     art = spike_glyph()
-    visible = {rid: art.solid_area(rid) for rid in art.regions}
+    visible = {rid: art.region_area(rid) for rid in art.regions}
     assert math.isclose(visible["A"], 1534.0, rel_tol=1e-9)
     assert math.isclose(visible["B"], 902.0, rel_tol=1e-9)
     assert math.isclose(visible["C"], 64.0, rel_tol=1e-9)
@@ -407,3 +411,85 @@ def test_dump_is_json_safe_and_records_the_topology():
     assert dump["regions"]["B"]["children"] == ["C"]
     assert dump["regions"]["B"]["colour"] == "red"
     assert "z" not in json.dumps(dump["regions"]["B"]).lower().replace("size", "")
+
+
+# --- immutable by structure, not by convention -------------------------------
+
+
+def test_regions_mapping_cannot_be_added_to_or_deleted_from():
+    art = spike_glyph()
+    with pytest.raises(TypeError):
+        art.regions["D"] = art.regions["C"]  # type: ignore[index]
+    with pytest.raises(TypeError):
+        del art.regions["A"]  # type: ignore[attr-defined]
+
+
+def test_containment_mapping_cannot_be_rewritten():
+    art = spike_glyph()
+    with pytest.raises(TypeError):
+        art._parents["C"] = "A"  # type: ignore[index]
+
+
+def test_artwork_attributes_cannot_be_rebound():
+    art = spike_glyph()
+    for attr, value in (("regions", {}), ("vertices", None), ("tolerance", 1.0)):
+        with pytest.raises(dataclasses.FrozenInstanceError):
+            setattr(art, attr, value)
+
+
+def test_a_region_cannot_be_edited_in_place():
+    art = spike_glyph()
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        art.regions["B"].colour = "green"  # type: ignore[misc]
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        art.regions["B"].outer = ()  # type: ignore[misc]
+
+
+def test_region_rings_are_tuples_so_they_cannot_be_appended_to():
+    art = spike_glyph()
+    assert isinstance(art.regions["B"].outer, tuple)
+    assert isinstance(art.regions["B"].holes, tuple)
+    with pytest.raises(AttributeError):
+        art.regions["B"].outer.append(0)  # type: ignore[attr-defined]
+
+
+def test_the_published_vertex_table_offers_no_way_to_add_a_vertex():
+    """Interning is a construction-time concern and is not published."""
+    art = spike_glyph()
+    assert not hasattr(art.vertices, "add")
+    assert not hasattr(art.vertices, "intern")
+    assert isinstance(art.vertices.coords, tuple)
+    with pytest.raises(AttributeError):
+        art.vertices.coords.append((0.0, 0.0))  # type: ignore[attr-defined]
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        art.vertices.coords = ()  # type: ignore[misc]
+
+
+def test_mutating_returned_geometry_does_not_reach_the_model():
+    """`coords_of` and `region_rings` hand back copies, not internal state."""
+    art = spike_glyph()
+    reference = spike_glyph()
+
+    ring = art.vertices.coords_of(art.regions["C"].outer)
+    ring[0] = (999.0, 999.0)
+    ring.append((123.0, 456.0))
+
+    rings = art.region_rings("B")
+    rings.clear()
+
+    assert art == reference
+    assert art.vertices.coords_of(art.regions["C"].outer)[0] != (999.0, 999.0)
+
+
+def test_the_interner_is_private_and_not_reachable_from_a_finished_artwork():
+    art = spike_glyph()
+    assert not hasattr(art, "interner")
+    assert type(art.vertices).__name__ == "VertexTable"
+
+
+def test_canonical_terminology_avoids_material_and_solid():
+    """Canonical regions are visible colour; material is a fabrication word."""
+    art = spike_glyph()
+    assert hasattr(art, "region_rings") and hasattr(art, "region_area")
+    assert not hasattr(art, "solid_rings")
+    assert not hasattr(art, "solid_area")

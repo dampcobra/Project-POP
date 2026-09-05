@@ -47,7 +47,7 @@ which holds the Spike 01 and Spike 02 experiments and their recorded evidence.
 coloured 2D regions and the containment between them, carrying no Z, thickness,
 clearance or backing. Regions form a non-overlapping *visible* partition: every
 point shows exactly one opaque colour, and hidden support beneath a region is a
-fabrication concern introduced downstream
+fabrication concern introduced downstream. The model is immutable by structure
 ([ADR 0003](docs/adr/0003-canonical-artwork-visible-surface-semantics.md)).
 
 `layercake.fabrication.FabricationProfile` — the fabrication

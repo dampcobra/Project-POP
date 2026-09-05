@@ -49,7 +49,8 @@ from __future__ import annotations
 
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Iterable, NamedTuple, Sequence
+from types import MappingProxyType
+from typing import Iterable, Mapping, NamedTuple, Sequence
 
 from ..geometry import polygons as poly
 
@@ -135,8 +136,13 @@ class ArtworkValidation(NamedTuple):
         }
 
 
-class VertexTable:
-    """Interns 2D points, snapping anything within `tolerance` onto one vertex."""
+class _VertexInterner:
+    """Mutable builder: snaps points within `tolerance` onto one vertex id.
+
+    Private and short-lived. It exists only while an artwork is being built and
+    is never published -- the finished artwork holds an immutable `VertexTable`
+    instead, so nothing downstream can add a vertex to a completed model.
+    """
 
     def __init__(self, tolerance: float = DEFAULT_TOLERANCE) -> None:
         self._tolerance = tolerance
@@ -155,31 +161,51 @@ class VertexTable:
     def intern(self, ring: Sequence[tuple[float, float]]) -> IndexRing:
         return tuple(self.add(x, y) for x, y in ring)
 
-    def coords_of(self, ring: IndexRing) -> Ring:
-        return [self._coords[i] for i in ring]
+    def finish(self) -> "VertexTable":
+        return VertexTable(coords=tuple(self._coords))
 
-    @property
-    def coords(self) -> tuple[tuple[float, float], ...]:
-        return tuple(self._coords)
+
+@dataclass(frozen=True)
+class VertexTable:
+    """The vertices of a finished artwork. Immutable by structure.
+
+    Deliberately offers no way to add a vertex: interning happens in
+    `_VertexInterner` during construction, and what the artwork publishes is
+    this read-only value. `coords` is a tuple, and `coords_of` hands back a
+    fresh list each call so a caller cannot reach the stored data through it.
+    """
+
+    coords: tuple[tuple[float, float], ...]
+
+    def coords_of(self, ring: IndexRing) -> Ring:
+        """The coordinates of a ring, as a new list the caller may modify."""
+        return [self.coords[i] for i in ring]
 
     def __len__(self) -> int:
-        return len(self._coords)
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, VertexTable) and self._coords == other._coords
-
-    def __hash__(self) -> int:  # pragma: no cover - not used as a key
-        return hash(self.coords)
+        return len(self.coords)
 
 
 @dataclass(frozen=True)
 class CanonicalArtwork:
-    """A partitioned artwork: coloured regions and the containment between them."""
+    """A partitioned artwork: coloured regions and the containment between them.
+
+    **Immutable by structure, not by convention.** A frozen dataclass alone would
+    not be enough: it prevents rebinding the attributes but not reaching through
+    them. So the regions and the containment are published as read-only mappings,
+    `Region` is frozen with tuple rings, and the vertex data is a `VertexTable`
+    with no way to add to it. Construction uses a mutable interner internally and
+    never publishes it.
+
+    Not hashable, because it holds mappings. Nothing needs to hash an artwork,
+    and equality -- which is what the no-mutation tests rely on -- works fine.
+    """
 
     vertices: VertexTable
-    regions: dict[str, Region]
+    regions: Mapping[str, Region]
     tolerance: float = DEFAULT_TOLERANCE
-    _parents: dict[str, str | None] = field(default_factory=dict, repr=False)
+    _parents: Mapping[str, str | None] = field(
+        default_factory=lambda: MappingProxyType({}), repr=False
+    )
 
     # -- construction ---------------------------------------------------------
 
@@ -196,26 +222,32 @@ class CanonicalArtwork:
         shared boundary is established by construction rather than detected
         afterwards. Input rings are never modified.
         """
-        table = VertexTable(tolerance)
-        regions: dict[str, Region] = {}
+        interner = _VertexInterner(tolerance)
+        built: dict[str, Region] = {}
 
         for spec in specs:
-            if spec.region_id in regions:
+            if spec.region_id in built:
                 raise ArtworkError(f"duplicate region id {spec.region_id!r}")
             outer = _clean(spec.outer, spec.region_id, "outer")
             holes = tuple(
                 _clean(h, spec.region_id, "hole") for h in spec.holes
             )
-            regions[spec.region_id] = Region(
+            built[spec.region_id] = Region(
                 region_id=spec.region_id,
                 colour=spec.colour,
-                outer=table.intern(outer),
-                holes=tuple(table.intern(h) for h in holes),
+                outer=interner.intern(outer),
+                holes=tuple(interner.intern(h) for h in holes),
             )
 
-        art = cls(vertices=table, regions=regions, tolerance=tolerance)
-        object.__setattr__(art, "_parents", art._compute_parents())
-        return art
+        # Everything mutable stays local. The instance is built once, complete,
+        # from read-only views -- no post-construction patching.
+        vertices = interner.finish()
+        return cls(
+            vertices=vertices,
+            regions=MappingProxyType(built),
+            tolerance=tolerance,
+            _parents=MappingProxyType(_compute_parents(vertices, built, tolerance)),
+        )
 
     # -- geometry access ------------------------------------------------------
 
@@ -223,8 +255,13 @@ class CanonicalArtwork:
         """A region's boundary, ignoring its holes."""
         return self.vertices.coords_of(self.regions[region_id].outer)
 
-    def solid_rings(self, region_id: str) -> list[Ring]:
-        """A region's material: outer ring plus holes, wound for booleans."""
+    def region_rings(self, region_id: str) -> list[Ring]:
+        """A region's visible surface: outer boundary plus holes, wound for booleans.
+
+        Canonical regions are visible coloured surface, not fabrication material
+        (ADR 0003). What comes back is where this colour is *seen*: the boundary
+        with any area covered by a child removed.
+        """
         region = self.regions[region_id]
         rings = [poly.oriented(self.vertices.coords_of(region.outer), ccw=True)]
         rings += [
@@ -232,8 +269,9 @@ class CanonicalArtwork:
         ]
         return rings
 
-    def solid_area(self, region_id: str) -> float:
-        return abs(poly.total_area(self.solid_rings(region_id)))
+    def region_area(self, region_id: str) -> float:
+        """The visible area of this colour, holes excluded."""
+        return abs(poly.total_area(self.region_rings(region_id)))
 
     def colours(self) -> tuple[str, ...]:
         """Every colour used, in first-seen order. Any number is fine."""
@@ -281,23 +319,6 @@ class CanonicalArtwork:
             self.outer_ring(outer_id), self.outer_ring(inner_id), self.tolerance
         )
 
-    def _compute_parents(self) -> dict[str, str | None]:
-        """Direct parent of each region: the smallest region enclosing it."""
-        areas = {
-            rid: abs(poly.area(self.outer_ring(rid))) for rid in self.regions
-        }
-        parents: dict[str, str | None] = {}
-        for inner in self.regions:
-            enclosing = [
-                outer
-                for outer in self.regions
-                if outer != inner and self.contains(outer, inner)
-            ]
-            parents[inner] = (
-                min(enclosing, key=lambda r: (areas[r], r)) if enclosing else None
-            )
-        return parents
-
     def parent_of(self, region_id: str) -> str | None:
         """The region directly enclosing this one, or None at the top level."""
         return self._parents[region_id]
@@ -339,14 +360,14 @@ class CanonicalArtwork:
         """
         tol = self.tolerance if tolerance is None else tolerance
 
-        solids = {rid: self.solid_rings(rid) for rid in self.regions}
+        surfaces = {rid: self.region_rings(rid) for rid in self.regions}
         ids = sorted(self.regions)
 
         overlaps: list[Overlap] = []
         total_overlap = 0.0
         for i, a in enumerate(ids):
             for b in ids[i + 1 :]:
-                shared = poly.boolean_op(solids[a], solids[b], "intersection")
+                shared = poly.boolean_op(surfaces[a], surfaces[b], "intersection")
                 overlap = abs(poly.total_area(shared))
                 if overlap > tol:
                     overlaps.append(Overlap(a, b, overlap))
@@ -357,7 +378,7 @@ class CanonicalArtwork:
             for hole in region.holes:
                 hole_ring = poly.oriented(self.vertices.coords_of(hole), ccw=True)
                 occupants = [
-                    solids[child]
+                    surfaces[child]
                     for child in self.regions
                     if child != rid
                 ]
@@ -418,6 +439,32 @@ class CanonicalArtwork:
                 for e, rs in sorted(shared.items())
             ],
         }
+
+
+def _compute_parents(
+    vertices: VertexTable,
+    regions: Mapping[str, Region],
+    tolerance: float,
+) -> dict[str, str | None]:
+    """Direct parent of each region: the smallest region enclosing it.
+
+    Module level rather than a method, so a finished artwork can be constructed
+    complete in one call instead of being patched after the fact.
+    """
+    outers = {rid: vertices.coords_of(r.outer) for rid, r in regions.items()}
+    areas = {rid: abs(poly.area(ring)) for rid, ring in outers.items()}
+
+    parents: dict[str, str | None] = {}
+    for inner in regions:
+        enclosing = [
+            outer
+            for outer in regions
+            if outer != inner and poly.encloses(outers[outer], outers[inner], tolerance)
+        ]
+        parents[inner] = (
+            min(enclosing, key=lambda r: (areas[r], r)) if enclosing else None
+        )
+    return parents
 
 
 def _clean(
