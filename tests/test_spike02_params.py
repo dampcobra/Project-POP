@@ -126,3 +126,18 @@ def test_backing_thickness_is_a_whole_number_of_layers():
 def test_round_1_as_printed_backing_is_preserved_as_history():
     """The printed evidence used a 0.8 mm backing; that must stay reproducible."""
     assert params.ROUND1_AS_PRINTED_BACKING_MM == 0.8
+
+
+def test_backing_floor_margin_is_recorded_as_unvalidated():
+    """The 0.40 mm floor is an engineering choice, not a measured result.
+
+    It is derived from a measured depth, which makes it easy to mistake for
+    measured itself. This pins the distinction so it survives refactoring.
+    """
+    import inspect
+
+    from layercake_spike.spike02 import params as p
+
+    src = inspect.getsource(p)
+    assert "NOT physically validated" in src
+    assert "PROVISIONAL ENGINEERING DEFAULT" in src

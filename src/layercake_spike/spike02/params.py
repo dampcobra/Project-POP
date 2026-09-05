@@ -63,6 +63,9 @@ FIXTURE_SUPPORT_MM: float = 1.6
 #: as a number checked inside individual tests -- which is part of why the
 #: backing's thickness looked like a free choice rather than a consequence.
 #: `check_floor` rejects a non-positive floor; this is the value we design to.
+#:
+#: NOT physically validated. Unlike MEASURED_DEFAULT_DEPTH_MM, no print has
+#: exercised this floor under a loaded recess. It is an engineering choice.
 MIN_RECESS_FLOOR_MM: float = 0.4
 
 #: Backing thickness is defined below, with the measured depth it is derived
@@ -196,9 +199,12 @@ HELD_CLEARANCE_MM: float = 0.05
 #: that artifact would leak into exported geometry and reports. The derivation is
 #: asserted by test instead.
 #:
-#: NOTE: this sits *exactly* at the minimum floor -- 0.40 mm of material under
-#: the recess, two layers. It is the rule's output, not a margin. Raising
-#: MIN_RECESS_FLOOR_MM is the way to buy margin if the product wants it.
+#: PROVISIONAL ENGINEERING DEFAULT -- weaker evidence than the depth it derives
+#: from. This sits *exactly* at the minimum floor: 0.40 mm of material under the
+#: recess, two layers, with no margin. The 0.80 mm engagement depth was measured
+#: physically; the 0.40 mm floor beneath it has never been printed or loaded, on
+#: the member that everything else glues to. Accepted as adequate for now, held
+#: to a lower standard deliberately. Raising MIN_RECESS_FLOOR_MM is the dial.
 BACKING_THICKNESS_MM: float = 1.2
 
 #: The backing thickness used for the round-1 article Andy actually printed.

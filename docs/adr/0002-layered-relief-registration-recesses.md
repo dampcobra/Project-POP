@@ -279,6 +279,13 @@ tilt resistance; XY accuracy is set by clearance and is unchanged by depth.
   which the two rounds so far did not have.
 - **Whether the depth result transfers as millimetres or as layers.** Only the
   0.20 mm layer-height case has been measured.
+- **Backing floor margin.** `MIN_RECESS_FLOOR_MM = 0.40 mm` is an engineering
+  choice, **not a physically validated value**. It has not been tested the way
+  the 0.80 mm engagement depth has: no print has ever exercised a 0.40 mm floor
+  beneath a loaded registration recess on the member everything else glues to.
+  `BACKING_THICKNESS_MM = 1.2 mm` is therefore a **provisional engineering
+  default**, accepted as adequate for now and explicitly held to a lower
+  evidential standard than the depth result it is derived from.
 - Minimum supporting thickness as a general production rule (1.2 mm is the
   minimum for the measured default, not a derived rule).
 - The S1/S2 corner-binding question, which both rounds left confounded.
@@ -307,7 +314,7 @@ ADR 0001 remains historically accurate and is **not** rewritten. Specifically:
 
 | Evidence | State |
 |---|---|
-| Z arithmetic, `H + D`, tops at 0.8/1.6/2.4 for both depths | Verified in software |
+| Z arithmetic, `H + D`, tops stepping by `H` from the backing, both depths | Verified in software |
 | Canonical hole → solid support with blind pocket | Verified in software (Euler number 2 on the enclosing body) |
 | Clearance present numerically, canonical unmutated | Verified in software |
 | Support continuous beneath every recess | Verified in software |
@@ -317,8 +324,12 @@ ADR 0001 remains historically accurate and is **not** rewritten. Specifically:
 | Recess depth sweep (round 2) | **Complete** — D = 0.80 mm preferred |
 | XY clearance as a measured value | **Not established** — held at the process floor; neither round could resolve it |
 | Corner binding (S1/S2) | **Not established** — confounded in both rounds |
+| Recess depth of 0.80 mm | **Measured** — round 2, scoped to the tested process |
+| Backing floor margin of 0.40 mm | **Not established** — an engineering choice, never printed or loaded. Deliberately *not* held to the same standard as the depth result, despite being derived from it |
 
 Decisions 1–7 stand on the software model and on physical validation.
 Decision 8's depth value is a **measured, provisional default scoped to the
-tested process**; its clearance value is **held, not measured**, and the two
-should not be read with equal confidence.
+tested process**; its clearance value is **held, not measured**; and the backing
+thickness derived from it is a **provisional engineering default whose floor
+margin has never been physically validated**. The three should not be read with
+equal confidence.
